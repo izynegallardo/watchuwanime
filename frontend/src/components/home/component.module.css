@@ -1,0 +1,201 @@
+.home {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: 64rem;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.home .intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem 0;
+}
+
+.home .introLabel {
+    margin-bottom: 0.5rem;
+    text-align: left;
+}
+
+.home .label {
+    font-family: monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--primary);
+}
+
+.home .title {
+    margin: 0 0 1.5rem;
+    font-family: var(--sans);
+    font-size: 3.75rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.05em;
+    text-align: left;
+}
+
+.home .description {
+    max-width: 20rem;
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.625;
+    color: var(--muted-foreground);
+    text-align: left;
+}
+
+.home .form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3rem;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+}
+
+.home .section {
+    border-top: 1px solid var(--border);
+    padding-top: 2rem;
+}
+
+.home .section:first-child {
+    border-top: 0;
+    padding-top: 0;
+}
+
+.home .sectionHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.home .sectionSubHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.home .sectionTitle {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+}
+
+.home .sectionNumber {
+    display: block;
+    margin-bottom: 0.25rem;
+    text-align: left;
+}
+
+.home .value {
+    font-family: monospace;
+    font-size: 1.875rem;
+    font-weight: 700;
+}
+
+.home .timeValue {
+    font-family: monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.home .peopleButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.home .peopleButton {
+    flex: 1 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--border);
+    font-family: monospace;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.home .peopleButton:hover {
+    opacity: 0.9;
+}
+
+.home .peopleButton.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+.home .peopleButton:not(.active) {
+    background: var(--muted);
+    color: var(--foreground);
+}
+
+.home .range {
+    width: 100%;
+}
+
+.home .timeLabels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+}
+
+.home .timeLabel {
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+}
+
+.home .timeLabel.active {
+    color: var(--primary);
+}
+
+.home .nextLink {
+    justify-content: center;
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    padding: 1rem;
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-align: center;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.home .nextLink:hover {
+    opacity: 0.9;
+}
+
+.home .nextLink:active {
+    transform: scale(0.99);
+}
+
+@media (min-width: 768px) {
+    .home {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .home .intro {
+        padding-right: 4rem;
+        border-right: 1px solid var(--border);
+    }
+
+    .home .form {
+        padding-left: 4rem;
+    }
+
+    .home .title {
+        font-size: 6rem;
+    }
+}

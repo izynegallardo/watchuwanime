@@ -1,0 +1,77 @@
+.footer {
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--border);
+}
+
+.footer .footerDiv {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    gap: 0.5em;
+}
+
+.footer section {
+    display: flex;
+    flex-direction: column;
+}
+
+.footer .footerSection {
+    gap: 0.5em;
+}
+
+.footer ul {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+}
+
+.footer li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer .linkIcon {
+    height: 32px;
+    width: 32px;
+    transition:
+        filter 0.25s ease,
+        transform 0.25s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+    }
+}
+
+.footer .github {
+    &:hover {
+        filter: drop-shadow(0 8px 20px var(--muted-foreground));
+    }
+}
+
+.footer .javascipt {
+    &:hover {
+        filter: drop-shadow(0 8px 20px #f7df1e);
+    }
+}
+
+.footer .vite {
+    &:hover {
+        filter: drop-shadow(0 8px 20px #9b3fff);
+    }
+}
+
+.footer .footerSpan {
+    font-family: monospace;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: var(--muted-foreground);
+}

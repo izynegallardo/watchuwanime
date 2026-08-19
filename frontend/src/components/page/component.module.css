@@ -1,0 +1,21 @@
+.page {
+    display: flex;
+    align-items: center;
+
+    .page-div {
+        width: 100%;
+    }
+
+    .page-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        place-items: center;
+    }
+
+    .link-div {
+        display: flex;
+        place-items: center;
+        flex: 1;
+    }
+}

@@ -1,0 +1,91 @@
+.themeToggle {
+    position: relative;
+}
+
+.themeToggle .themeButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    padding: 0;
+    border: 0;
+
+    background: transparent;
+
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    letter-spacing: 0.1em;
+
+    color: var(--muted-foreground);
+
+    cursor: pointer;
+
+    transition: color 200ms ease-in-out;
+}
+
+.themeToggle .themeButton:hover {
+    color: var(--text-h);
+}
+
+.themeToggle .textForeground {
+    color: var(--text-h);
+}
+
+.themeToggle .textMutedForeground {
+    color: var(--muted-foreground);
+}
+
+.themeToggle .textBorder {
+    color: var(--border);
+}
+
+.themeToggle .switch {
+    position: relative;
+    display: inline-block;
+
+    width: 2rem;
+    height: 1rem;
+    margin-left: 0.25rem;
+
+    background: var(--muted);
+    border: 1px solid var(--border);
+
+    transition:
+        background-color 200ms ease,
+        border-color 200ms ease;
+}
+
+.themeToggle .switchThumb {
+    position: absolute;
+    top: 1px;
+    left: 2px;
+
+    width: 0.75rem;
+    height: 0.75rem;
+
+    background: var(--primary);
+
+    transform: translateX(0);
+
+    transition:
+        transform 200ms ease,
+        background-color 200ms ease;
+}
+
+.themeToggle .switchThumbLight {
+    transform: translateX(16px);
+}
+
+.themeToggle .darkLabel,
+.themeToggle .lightLabel {
+    transition: color 200ms ease;
+}
+
+.themeToggle .textForeground {
+    color: var(--text-h);
+}
+
+.themeToggle .textMutedForeground {
+    color: var(--muted-foreground);
+}
