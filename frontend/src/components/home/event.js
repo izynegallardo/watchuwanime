@@ -8,28 +8,29 @@ import {
     subscribeTimeIndex,
 } from '@/store/counter'
 
+const TIME_STEPS = [20, 40, 60, 120, 180, 240]
+
+const TIME_LABELS = {
+    20: '20m',
+    40: '40m',
+    60: '1hr',
+    120: '2hrs',
+    180: '3hrs',
+    240: '4+ hrs',
+}
+
 export default function Events() {
-    const TIME_STEPS = [20, 40, 60, 120, 180, 240]
+    try {
+        // console.log('Viewer count:', viewerCount())
 
-    const TIME_LABELS = {
-        20: '20m',
-        40: '40m',
-        60: '1hr',
-        120: '2hrs',
-        180: '3hrs',
-        240: '4+ hrs',
-    }
+        function renderForm() {
+            const currentTimeIndex = timeIndex()
+            const currentViewerCount = viewerCount()
+            const timeAvailable = TIME_STEPS[currentTimeIndex]
 
-    // console.log('Viewer count:', viewerCount())
+            // console.log('Time available:', timeAvailable)
 
-    const render = () => {
-        const currentTimeIndex = timeIndex()
-        const currentViewerCount = viewerCount()
-        const timeAvailable = TIME_STEPS[currentTimeIndex]
-
-        // console.log('Time available:', timeAvailable)
-
-        document.querySelector('#form').innerHTML = `
+            document.querySelector('#form').innerHTML = `
             <section class="${styles.section}">
                 <div class="${styles.sectionHeader}">
                     <div class="${styles.sectionSubHeader}">
@@ -102,25 +103,28 @@ export default function Events() {
             </section>
 
             <section class="${styles.section}">
-                <a class="${styles.nextLink}" href='/pages/1'>
+                <a class="${styles.nextLink}" href='/questions/1'>
                     NEXT →
                 </a>
             </section>
         `
 
-        document.querySelectorAll('[data-viewers]').forEach((button) => {
-            button.addEventListener('click', () => {
-                setViewerCount(Number(button.dataset.viewers))
-                // console.log('Viewer count:', currentViewerCount)
+            document.querySelectorAll('[data-viewers]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    setViewerCount(Number(button.dataset.viewers))
+                    // console.log('Viewer count:', currentViewerCount)
+                })
             })
-        })
 
-        document.querySelector('#time-range').addEventListener('change', (event) => {
-            setTimeIndex(Number(event.target.value))
-        })
+            document.querySelector('#time-range').addEventListener('change', (event) => {
+                setTimeIndex(Number(event.target.value))
+            })
+        }
+
+        renderForm()
+        subscribeViewerCount(renderForm)
+        subscribeTimeIndex(renderForm)
+    } catch (error) {
+        console.error('Home page event:', error)
     }
-
-    render()
-    subscribeViewerCount(render)
-    subscribeTimeIndex(render)
 }

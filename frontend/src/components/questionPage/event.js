@@ -1,0 +1,119 @@
+import styles from './component.module.css'
+import {
+    viewerCount,
+    selectedGenres,
+    setSelectedGenres,
+    subscribeSelectedGenres,
+    currentUserIndex,
+    setCurrentUserIndex,
+    subscribeCurrentUserIndex,
+    setAnswer,
+} from '@/store/counter'
+import { GENRES } from '@/data/genres'
+import { PLACEHOLDERS } from '@/data/placeholders'
+import { getRandomInt } from '@/utils/random'
+
+export default function Events() {
+    try {
+        function isLastUser() {
+            return currentUserIndex() + 1 >= viewerCount()
+        }
+
+        function renderUserCounter() {
+            document.querySelector('#user-counter').textContent =
+                `USER ${String(currentUserIndex() + 1).padStart(2, '0')} OF ${String(viewerCount()).padStart(2, '0')}`
+        }
+
+        function renderTextArea() {
+            const textareaEl = document.querySelector('#text-area')
+
+            const randIndex = getRandomInt(0, PLACEHOLDERS.length)
+            const placeholder = PLACEHOLDERS[randIndex]
+
+            textareaEl.innerHTML = `
+                <label class='${styles.formlabel}'>
+                    YOUR ANSWER
+                </label>
+
+                <textarea
+                    id='answer-text-area'
+                    class='${styles.answerTextarea}'
+                    placeholder='${placeholder}'
+                    rows='5'
+                ></textarea>
+            `
+        }
+
+        function renderGenreList() {
+            const genreListEl = document.querySelector('#genre-list')
+
+            genreListEl.innerHTML = GENRES.map((genre) => {
+                const active = selectedGenres().includes(genre)
+
+                return `
+                    <button
+                        type='button'
+                        class='${styles.genreButton} ${active ? styles.active : ''}'
+                        data-genre='${genre}'
+                    >
+                        ${genre.toUpperCase()}
+                    </button>
+                `
+            }).join('')
+
+            genreListEl.querySelectorAll('[data-genre]').forEach((button) => {
+                button.addEventListener('click', () => toggleGenre(button.dataset.genre))
+            })
+        }
+
+        function toggleGenre(genre) {
+            setSelectedGenres((prev) =>
+                prev.includes(genre) ? prev.filter((g) => g !== genre) : [...prev, genre],
+            )
+        }
+
+        function renderFooterBtn() {
+            document.querySelector('#form-footer').innerHTML = `
+                <a id='next-link' class='${styles.nextLink}'>
+                    ${isLastUser() ? 'SEE RECOMMENDATIONS →' : 'NEXT USER →'}
+                </a>
+            `
+
+            document.querySelector('#next-link').addEventListener('click', handleNext)
+        }
+
+        function wireAnswerInput() {
+            document.querySelector('#answer-text-area').addEventListener('input', (event) => {
+                setAnswer(event.target.value)
+            })
+        }
+
+        function handleNext() {
+            if (isLastUser()) {
+                // TODO: send collected answers to the backend, then route to /results
+                return
+            }
+
+            setCurrentUserIndex((prev) => prev + 1)
+            setSelectedGenres([])
+            setAnswer('')
+            document.querySelector('#answer-text-area').value = ''
+            render()
+        }
+
+        function render() {
+            renderUserCounter()
+            renderTextArea()
+            renderGenreList()
+            renderFooterBtn()
+        }
+
+        render()
+        wireAnswerInput()
+
+        subscribeSelectedGenres(render)
+        subscribeCurrentUserIndex(render)
+    } catch (error) {
+        console.log('Question Page Event:', error)
+    }
+}

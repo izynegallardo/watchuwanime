@@ -13,7 +13,7 @@
     }
 
     a {
-        font-family: monospace;
+        font-family: var(--mono);
         font-size: 0.75rem;
         letter-spacing: 0.1em;
         color: var(--muted-foreground);

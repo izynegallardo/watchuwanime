@@ -70,7 +70,7 @@
 }
 
 .footer .footerSpan {
-    font-family: monospace;
+    font-family: var(--mono);
     font-size: 0.75rem;
     line-height: 1rem;
     color: var(--muted-foreground);

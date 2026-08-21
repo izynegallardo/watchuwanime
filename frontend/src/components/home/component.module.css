@@ -21,7 +21,7 @@
 }
 
 .home .label {
-    font-family: monospace;
+    font-family: var(--mono);
     font-size: 0.75rem;
     letter-spacing: 0.1em;
     color: var(--primary);
@@ -94,13 +94,13 @@
 }
 
 .home .value {
-    font-family: monospace;
+    font-family: var(--mono);
     font-size: 1.875rem;
     font-weight: 700;
 }
 
 .home .timeValue {
-    font-family: monospace;
+    font-family: var(--mono);
     font-size: 1.5rem;
     font-weight: 700;
 }
@@ -115,7 +115,7 @@
     flex: 1 2.5rem;
     height: 2.5rem;
     border: 1px solid var(--border);
-    font-family: monospace;
+    font-family: var(--mono);
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
@@ -148,7 +148,7 @@
 }
 
 .home .timeLabel {
-    font-family: monospace;
+    font-family: var(--mono);
     font-size: 0.75rem;
     color: var(--muted-foreground);
 }
@@ -160,7 +160,7 @@
 .home .nextLink {
     justify-content: center;
     width: 100%;
-    border: 0;
+    border: none;
     border-radius: 0;
     padding: 1rem;
     background: var(--primary);
@@ -174,7 +174,8 @@
 }
 
 .home .nextLink:hover {
-    opacity: 0.9;
+    text-decoration: none;
+    opacity: 0.8;
 }
 
 .home .nextLink:active {
