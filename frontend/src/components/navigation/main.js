@@ -1,5 +1,5 @@
 import styles from './component.module.css'
-import ThemeToggle from '../themeToggle/main'
+import ThemeToggle from '@/themeToggle/main'
 
 export default function Navigation(root) {
     root.innerHTML = `
