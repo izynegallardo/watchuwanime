@@ -8,9 +8,11 @@ import {
     setCurrentUserIndex,
     subscribeCurrentUserIndex,
     setAnswer,
+    setRecommendations,
 } from '@/store/counter'
 import { GENRES } from '@/data/genres'
 import { PLACEHOLDERS } from '@/data/placeholders'
+import { fetchRecommendations } from '@/data/fetchRecommendations'
 import { getRandomInt } from '@/utils/random'
 
 export default function Events() {
@@ -88,9 +90,27 @@ export default function Events() {
             })
         }
 
+        let isFetchingRecommendations = false
+
         function handleNext() {
             if (isLastUser()) {
-                // TODO: send collected answers to the backend, then route to /results
+                if (isFetchingRecommendations) return
+                isFetchingRecommendations = true
+
+                const nextLinkEl = document.querySelector('#next-link')
+                nextLinkEl.textContent = 'LOADING...'
+
+                fetchRecommendations()
+                    .then((data) => {
+                        setRecommendations(data)
+                        window.app.pushRoute('/results')
+                    })
+                    .catch((error) => {
+                        console.error('Failed to fetch recommendations:', error)
+                        isFetchingRecommendations = false
+                        nextLinkEl.textContent = 'SEE RECOMMENDATIONS →'
+                    })
+
                 return
             }
 
@@ -103,11 +123,11 @@ export default function Events() {
 
         function render() {
             renderUserCounter()
-            renderTextArea()
             renderGenreList()
             renderFooterBtn()
         }
 
+        renderTextArea()
         render()
         wireAnswerInput()
 

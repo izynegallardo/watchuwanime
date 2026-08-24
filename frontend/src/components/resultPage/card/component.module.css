@@ -1,0 +1,112 @@
+.animeCard {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background: var(--card);
+}
+
+.animeCardImage {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    background: var(--muted);
+    overflow: hidden;
+}
+
+.animeCardImg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.animeCardGradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 50%);
+}
+
+.animeCardMeta {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+.animeCardIndex {
+    color: rgba(255, 255, 255, 0.7);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+}
+
+.animeCardBadge {
+    padding: 0.125rem 0.5rem;
+    background: var(--primary);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+}
+
+.animeCardBody {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 1.5rem;
+    border-top: 2px solid var(--primary);
+    max-height: 420px;
+    text-align: left;
+    overflow: auto;
+}
+
+.animeCardTitleRow {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.animeCardTitle {
+    font-family: var(--sans);
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.01em;
+}
+
+.animeCardYear {
+    flex-shrink: 0;
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: 0.875rem;
+}
+
+.animeCardTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.animeCardTag {
+    padding: 0.125rem 0.5rem;
+    border: 1px solid var(--border);
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+}
+
+.animeCardSummary {
+    flex: 1;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    text-align: center;
+}

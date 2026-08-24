@@ -1,5 +1,5 @@
 import styles from './component.module.css'
-import ThemeToggle from '@/themeToggle/main'
+import ThemeToggle from '../../themeToggle/main'
 
 export default function Navigation(root) {
     root.innerHTML = `
@@ -9,6 +9,6 @@ export default function Navigation(root) {
         </ul>
     `
 
-    root.className = styles['navigation']
+    root.className = styles.navigation
     ThemeToggle(document.getElementById('li-theme-toggle'))
 }

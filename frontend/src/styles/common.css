@@ -10,13 +10,13 @@
 :root {
     --card: #ffffff;
 
-    --primary: #e53528;
+    --primary: #d92b20;
     --primary-foreground: #ffffff;
 
     --muted: #e2e2e2;
     --muted-foreground: #555555;
 
-    --accent: #e53528;
+    --accent: #d92b20;
     --border: #d0d0d0;
 
     --text: #555555;
@@ -36,7 +36,6 @@
     --mono: 'JetBrains Mono', 'Courier New', ui-monospace, Consolas, monospace;
 
     letter-spacing: 0.18px;
-    line-height: 1.5;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -50,19 +49,18 @@
 .dark {
     --card: #1c1c1c;
 
-    --primary: #e53528;
-    --primary-foreground: #ffffff;
+    --primary: #db3829;
+    --accent: #db3829;
 
     --muted: #2a2a2a;
     --muted-foreground: #b5b5b5;
 
-    --accent: #e53528;
     --border: #3a3a3a;
 
     --text: #b5b5b5;
     --text-h: #f5f5f5;
 
-    --bg: #111111;
+    --bg: #000000;
     --code-bg: #1f2028;
 
     --accent-bg: rgba(229, 53, 40, 0.15);
@@ -80,8 +78,9 @@ body,
     margin: 0;
     width: 100%;
     min-width: 280px;
-    height: 100%;
+    min-height: 100%;
     font-family: var(--sans);
+    line-height: 1.5;
 }
 
 body {
@@ -142,7 +141,6 @@ a {
     place-items: center;
     gap: 0.5em;
     border-radius: 6px;
-    padding: 6px 12px;
     color: var(--text-h);
     font-size: 1rem;
     transition: box-shadow 0.3s;

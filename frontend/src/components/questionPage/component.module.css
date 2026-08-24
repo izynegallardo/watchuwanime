@@ -1,5 +1,6 @@
 .question {
     flex: 1;
+    justify-content: center;
     width: 100%;
     max-width: 42rem; /* max-w-2xl */
     margin: 0 auto;
@@ -102,7 +103,7 @@
 }
 
 .question .genreButton {
-    flex: 1 1 8em;
+    flex: 1 1 10em;
 
     padding: 0.375rem 0.75rem;
 

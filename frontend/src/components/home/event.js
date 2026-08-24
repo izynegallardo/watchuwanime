@@ -103,7 +103,7 @@ export default function Events() {
             </section>
 
             <section class="${styles.section}">
-                <a class="${styles.nextLink}" href='/questions/1'>
+                <a class="${styles.nextLink}" href='/questions'>
                     NEXT →
                 </a>
             </section>

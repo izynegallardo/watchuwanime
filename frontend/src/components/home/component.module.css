@@ -85,6 +85,7 @@
     font-size: 1.125rem;
     font-weight: 600;
     letter-spacing: -0.025em;
+    text-align: left;
 }
 
 .home .sectionNumber {
@@ -112,11 +113,11 @@
 }
 
 .home .peopleButton {
-    flex: 1 2.5rem;
-    height: 2.5rem;
+    flex: 1;
     border: 1px solid var(--border);
+    padding: 0.5em 1em;
     font-family: var(--mono);
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 150ms ease;

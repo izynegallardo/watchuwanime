@@ -1,5 +1,5 @@
 .footer {
-    padding: 2rem;
+    padding: 2em;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -29,7 +29,7 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 0.5em;
+    gap: 1em;
 }
 
 .footer li {
@@ -71,7 +71,6 @@
 
 .footer .footerSpan {
     font-family: var(--mono);
-    font-size: 0.75rem;
-    line-height: 1rem;
+    font-size: 0.75em;
     color: var(--muted-foreground);
 }
