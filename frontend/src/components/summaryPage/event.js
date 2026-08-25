@@ -1,4 +1,5 @@
 import styles from './component.module.css'
+import { recommendations } from '@/store/counter'
 
 export default function Events() {
     try {
@@ -16,46 +17,46 @@ export default function Events() {
                     </thead>
 
                     <tbody>
-                        ${recommendations
+                        ${recommendations()
                             .map((anime, i) => {
                                 const isEven = i % 2 === 0
 
                                 return `
-                                <tr
-                                    class='${styles.tableRow} ${isEven ? styles.evenRow : styles.oddRow}'
-                                    data-index='${i}'
-                                >
-                                    <td class='${styles.indexCell}'>
-                                        ${String(i + 1).padStart(2, '0')}
-                                    </td>
+                                    <tr
+                                        class='${styles.tableRow} ${isEven ? styles.evenRow : styles.oddRow}'
+                                        data-index='${i}'
+                                    >
+                                        <td class='${styles.indexCell}'>
+                                            ${String(i + 1).padStart(2, '0')}
+                                        </td>
 
-                                    <td class='${styles.titleCell}'>
-                                        ${anime.title}
-                                    </td>
+                                        <td class='${styles.titleCell}'>
+                                            ${anime.title}
+                                        </td>
 
-                                    <td class='${styles.metaCell}'>
-                                        ${anime.year}
-                                    </td>
+                                        <td class='${styles.metaCell}'>
+                                            ${anime.year}
+                                        </td>
 
-                                    <td class='${styles.metaCell}'>
-                                        ${anime.episodeCount === 1 ? 'FILM' : `${anime.episodeCount} EPS`}
-                                    </td>
+                                        <td class='${styles.metaCell}'>
+                                            ${anime.episodeCount === 1 ? 'FILM' : `${anime.episodeCount} EPS`}
+                                        </td>
 
-                                    <td class='${styles.genresCell}'>
-                                        <div class='${styles.genreList}'>
-                                            ${anime.genres
-                                                .map(
-                                                    (g) => `
-                                                <span class='${styles.genre}'>
-                                                    ${g}
-                                                </span>
-                                            `,
-                                                )
-                                                .join('')}
-                                        </div>
-                                    </td>
-                                </tr>
-                            `
+                                        <td class='${styles.genresCell}'>
+                                            <div class='${styles.genreList}'>
+                                                ${anime.genres
+                                                    .map(
+                                                        (genre) => `
+                                                    <span class='${styles.genre}'>
+                                                        ${genre}
+                                                    </span>
+                                                `,
+                                                    )
+                                                    .join('')}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `
                             })
                             .join('')}
                     </tbody>
@@ -65,9 +66,9 @@ export default function Events() {
 
         function renderActions() {
             document.querySelector('#actions-container').innerHTML = `
-                <button class='${styles.tryAgainButton}'>
+                <a class='${styles.tryAgainLink}' href='/'>
                     ← TRY AGAIN
-                </button>
+                </a>
 
                 ${
                     canMore
@@ -81,6 +82,9 @@ export default function Events() {
             
             `
         }
+
+        renderTable()
+        renderActions()
     } catch (error) {
         console.error('Summary Page event:', error)
     }

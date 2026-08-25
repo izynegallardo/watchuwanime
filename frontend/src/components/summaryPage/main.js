@@ -8,13 +8,15 @@ export default function Main(root) {
             </span>
         </div>
 
-        <div id='table-container' class='${styles.tableContainer}'> </div>
+        <div class='${styles.summaryContainer}'>
+            <div id='table-container' class='${styles.tableContainer}'> </div>
 
-        <div id='actions-container' class='${styles.actions}'></div>
+            <div id='actions-container' class='${styles.actions}'></div>
 
-        <p class='${styles.hint}'>
-            CLICK ANY ROW TO VIEW DETAILS
-        </p>
+            <p class='${styles.hint}'>
+                CLICK ANY ROW TO VIEW DETAILS
+            </p>
+        </div
     `
 
     root.className = styles.summary

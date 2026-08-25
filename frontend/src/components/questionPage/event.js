@@ -12,7 +12,7 @@ import {
 } from '@/store/counter'
 import { GENRES } from '@/data/genres'
 import { PLACEHOLDERS } from '@/data/placeholders'
-import { fetchRecommendations } from '@/data/fetchRecommendations'
+import { fetchRecommendations } from '@/api/anime'
 import { getRandomInt } from '@/utils/random'
 
 export default function Events() {
