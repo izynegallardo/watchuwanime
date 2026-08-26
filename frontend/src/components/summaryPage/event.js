@@ -1,8 +1,16 @@
 import styles from './component.module.css'
-import { recommendations } from '@/store/counter'
+import { recommendations, setRecommendations, shownIds, setShownIds } from '@/store/counter'
+import { fetchRecommendations } from '@/api/anime'
+import { setIndex as setCarouselIndex } from '@/components/resultPage/event'
+
+const MAX_SHOWN = 30
 
 export default function Events() {
     try {
+        function canMore() {
+            return shownIds().length < MAX_SHOWN
+        }
+
         function renderTable() {
             document.querySelector('#table-container').innerHTML = `
                 <table class='${styles.table}'>
@@ -62,6 +70,13 @@ export default function Events() {
                     </tbody>
                 </table>
             `
+
+            document.querySelectorAll('[data-index]').forEach((row) => {
+                row.addEventListener('click', () => {
+                    setCarouselIndex(Number(row.dataset.index))
+                    window.app.pushRoute('/results')
+                })
+            })
         }
 
         function renderActions() {
@@ -71,16 +86,44 @@ export default function Events() {
                 </a>
 
                 ${
-                    canMore
+                    canMore()
                         ? `
-                    <button class='${styles.moreButton}'>
-                        MORE RECOMMENDATIONS →
-                    </button>
-                `
+                            <button id='more-button' class='${styles.moreButton}'>
+                                MORE RECOMMENDATIONS →
+                            </button>
+                        `
                         : ''
                 }
-            
             `
+
+            const moreButton = document.querySelector('#more-button')
+            if (moreButton) {
+                moreButton.addEventListener('click', handleMore)
+            }
+        }
+
+        let isFetchingMore = false
+
+        function handleMore() {
+            if (isFetchingMore) return
+            isFetchingMore = true
+
+            const moreButton = document.querySelector('#more-button')
+            moreButton.disabled = true
+            moreButton.textContent = 'LOADING...'
+
+            fetchRecommendations(shownIds())
+                .then((data) => {
+                    setRecommendations(data)
+                    setShownIds((prev) => [...prev, ...data.map((anime) => anime.id)])
+                    window.app.pushRoute('/results')
+                })
+                .catch((error) => {
+                    console.error('Failed to fetch more recommendations:', error)
+                    isFetchingMore = false
+                    moreButton.disabled = false
+                    moreButton.textContent = 'MORE RECOMMENDATIONS →'
+                })
         }
 
         renderTable()

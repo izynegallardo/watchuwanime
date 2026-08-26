@@ -9,6 +9,7 @@ import {
     subscribeCurrentUserIndex,
     setAnswer,
     setRecommendations,
+    setShownIds,
 } from '@/store/counter'
 import { GENRES } from '@/data/genres'
 import { PLACEHOLDERS } from '@/data/placeholders'
@@ -103,6 +104,7 @@ export default function Events() {
                 fetchRecommendations()
                     .then((data) => {
                         setRecommendations(data)
+                        setShownIds(data.map((anime) => anime.id))
                         window.app.pushRoute('/results')
                     })
                     .catch((error) => {
@@ -131,8 +133,13 @@ export default function Events() {
         render()
         wireAnswerInput()
 
-        subscribeSelectedGenres(render)
-        subscribeCurrentUserIndex(render)
+        const unsubscribeSelectedGenres = subscribeSelectedGenres(render)
+        const unsubscribeCurrentUserIndex = subscribeCurrentUserIndex(render)
+
+        return () => {
+            unsubscribeSelectedGenres()
+            unsubscribeCurrentUserIndex()
+        }
     } catch (error) {
         console.log('Question Page Event:', error)
     }

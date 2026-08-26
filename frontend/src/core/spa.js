@@ -1,5 +1,6 @@
 class SPA {
     routes = []
+    currentCleanup = null
 
     constructor(config = {}) {
         this.context = {
@@ -28,6 +29,19 @@ class SPA {
 
     execute(path) {
         document.body.className = ''
+
+        // Tear down the previous page's store subscriptions before mounting the
+        // next one. Without this, every subscribe*() call in an event.js accumulates
+        // forever across navigations: old pages keep re-rendering into DOM nodes
+        // that no longer exist, throwing on querySelector(...).innerHTML, and (since
+        // that throw happens synchronously inside a state setter) can silently abort
+        // whatever the *current* page's code was doing when it triggered the update.
+        if (typeof this.currentCleanup === 'function') {
+            this.currentCleanup()
+        }
+
+        this.currentCleanup = null
+
         const route = this.get(path)
         let params
 
@@ -42,7 +56,11 @@ class SPA {
             }
         }
 
-        route?.callback(params)
+        const cleanup = route?.callback(params)
+
+        if (typeof cleanup === 'function') {
+            this.currentCleanup = cleanup
+        }
     }
 
     setDefault(cb) {

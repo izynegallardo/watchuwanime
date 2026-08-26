@@ -5,6 +5,8 @@ import { recommendations, subscribeRecommendations } from '@/store/counter'
 
 const [index, setIndex, subscribeIndex] = useState(0)
 
+export { setIndex }
+
 let lastDirection = 1
 
 export default function Events() {
@@ -129,12 +131,17 @@ export default function Events() {
 
         render()
 
-        subscribeRecommendations(() => {
+        const unsubscribeRecommendations = subscribeRecommendations(() => {
             lastDirection = 1
             setIndex(0)
             render()
         })
-        subscribeIndex(render)
+        const unsubscribeIndex = subscribeIndex(render)
+
+        return () => {
+            unsubscribeRecommendations()
+            unsubscribeIndex()
+        }
     } catch (error) {
         console.log('Result Page Event:', error)
     }

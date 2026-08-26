@@ -122,8 +122,14 @@ export default function Events() {
         }
 
         renderForm()
-        subscribeViewerCount(renderForm)
-        subscribeTimeIndex(renderForm)
+
+        const unsubscribeViewerCount = subscribeViewerCount(renderForm)
+        const unsubscribeTimeIndex = subscribeTimeIndex(renderForm)
+
+        return () => {
+            unsubscribeViewerCount()
+            unsubscribeTimeIndex()
+        }
     } catch (error) {
         console.error('Home page event:', error)
     }
