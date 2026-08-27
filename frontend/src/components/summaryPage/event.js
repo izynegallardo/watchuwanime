@@ -1,5 +1,12 @@
 import styles from './component.module.css'
-import { recommendations, setRecommendations, shownIds, setShownIds } from '@/store/counter'
+import {
+    recommendations,
+    setRecommendations,
+    shownIds,
+    setShownIds,
+    sessionAnswers,
+    setSessionAnswers,
+} from '@/store/counter'
 import { fetchRecommendations } from '@/api/anime'
 import { setIndex as setCarouselIndex } from '@/components/resultPage/event'
 
@@ -112,7 +119,7 @@ export default function Events() {
             moreButton.disabled = true
             moreButton.textContent = 'LOADING...'
 
-            fetchRecommendations(shownIds())
+            fetchRecommendations(sessionAnswers(), shownIds())
                 .then((data) => {
                     setRecommendations(data)
                     setShownIds((prev) => [...prev, ...data.map((anime) => anime.id)])

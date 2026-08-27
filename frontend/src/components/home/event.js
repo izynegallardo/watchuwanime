@@ -6,6 +6,9 @@ import {
     timeIndex,
     setTimeIndex,
     subscribeTimeIndex,
+    setSessionAnswers,
+    setShownIds,
+    setCurrentUserIndex,
 } from '@/store/counter'
 
 const TIME_STEPS = [20, 40, 60, 120, 180, 240]
@@ -21,6 +24,9 @@ const TIME_LABELS = {
 
 export default function Events() {
     try {
+        setSessionAnswers([])
+        setShownIds([])
+        setCurrentUserIndex(0)
         // console.log('Viewer count:', viewerCount())
 
         function renderForm() {

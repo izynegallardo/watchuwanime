@@ -7,7 +7,11 @@ import {
     currentUserIndex,
     setCurrentUserIndex,
     subscribeCurrentUserIndex,
+    answer,
     setAnswer,
+    sessionAnswers,
+    setSessionAnswers,
+    subscribeSessionAnswers,
     setRecommendations,
     setShownIds,
 } from '@/store/counter'
@@ -101,7 +105,13 @@ export default function Events() {
                 const nextLinkEl = document.querySelector('#next-link')
                 nextLinkEl.textContent = 'LOADING...'
 
-                fetchRecommendations()
+                const allAnswers = [
+                    ...sessionAnswers(),
+                    { genres: selectedGenres(), answer: answer() },
+                ]
+                setSessionAnswers(allAnswers)
+
+                fetchRecommendations(allAnswers)
                     .then((data) => {
                         setRecommendations(data)
                         setShownIds(data.map((anime) => anime.id))
@@ -116,6 +126,7 @@ export default function Events() {
                 return
             }
 
+            setSessionAnswers((prev) => [...prev, { genres: selectedGenres(), answer: answer() }])
             setCurrentUserIndex((prev) => prev + 1)
             setSelectedGenres([])
             setAnswer('')
@@ -135,10 +146,12 @@ export default function Events() {
 
         const unsubscribeSelectedGenres = subscribeSelectedGenres(render)
         const unsubscribeCurrentUserIndex = subscribeCurrentUserIndex(render)
+        const unsubscribeSessionAnswers = subscribeSessionAnswers(render)
 
         return () => {
             unsubscribeSelectedGenres()
             unsubscribeCurrentUserIndex()
+            unsubscribeSessionAnswers()
         }
     } catch (error) {
         console.log('Question Page Event:', error)
