@@ -29,7 +29,7 @@ const POOL = buildPool()
 // (see Project Plan: chat prompt design + Render deployment are still pending).
 // excludeIds mirrors the demo's shownIds exclusion so "More Recommendations"
 // doesn't repeat anime already shown earlier in the session.
-export async function fetchRecommendations(answers, excludeIds = []) {
+export async function fetchRecommendations(answers, timeAvailable, excludeIds = []) {
     const excluded = new Set(excludeIds)
 
     return POOL.filter((anime) => !excluded.has(anime.id)).slice(0, BATCH_SIZE)

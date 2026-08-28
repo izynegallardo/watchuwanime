@@ -1,6 +1,7 @@
 import styles from './component.module.css'
 import {
     viewerCount,
+    timeIndex,
     selectedGenres,
     setSelectedGenres,
     subscribeSelectedGenres,
@@ -17,6 +18,7 @@ import {
 } from '@/store/counter'
 import { GENRES } from '@/data/genres'
 import { PLACEHOLDERS } from '@/data/placeholders'
+import { TIME_STEPS } from '@/data/time'
 import { fetchRecommendations } from '@/api/anime'
 import { getRandomInt } from '@/utils/random'
 
@@ -111,7 +113,7 @@ export default function Events() {
                 ]
                 setSessionAnswers(allAnswers)
 
-                fetchRecommendations(allAnswers)
+                fetchRecommendations(allAnswers, TIME_STEPS[timeIndex()])
                     .then((data) => {
                         setRecommendations(data)
                         setShownIds(data.map((anime) => anime.id))
