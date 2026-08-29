@@ -13,12 +13,23 @@
     overflow: hidden;
 }
 
+.animeCardImage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--bg-image);
+    background-size: cover;
+    background-position: center;
+    filter: blur(20px) brightness(0.5);
+    transform: scale(1.15);
+}
+
 .animeCardImg {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .animeCardGradient {
@@ -109,4 +120,14 @@
     font-size: 0.875rem;
     line-height: 1.6;
     text-align: center;
+}
+
+.animeCardSynopsis {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted-foreground);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    text-align: left;
 }

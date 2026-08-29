@@ -27,7 +27,7 @@ export default function Events() {
                         <tr class='${styles.tableHeaderRow}'>
                             <th class='${styles.tableHeader}'>#</th>
                             <th class='${styles.tableHeader}'>TITLE</th>
-                            <th class='${styles.tableHeader}'>YEAR</th>
+                            <th class='${styles.tableHeader}'>STATUS</th>
                             <th class='${styles.tableHeader}'>TYPE</th>
                             <th class='${styles.tableHeader}'>GENRES</th>
                         </tr>
@@ -52,11 +52,11 @@ export default function Events() {
                                         </td>
 
                                         <td class='${styles.metaCell}'>
-                                            ${anime.year}
+                                            ${anime.status}
                                         </td>
 
                                         <td class='${styles.metaCell}'>
-                                            ${anime.episodeCount === 1 ? 'FILM' : `${anime.episodeCount} EPS`}
+                                            ${anime.type.toUpperCase()}
                                         </td>
 
                                         <td class='${styles.genresCell}'>
