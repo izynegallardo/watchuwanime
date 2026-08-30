@@ -1,0 +1,48 @@
+{
+    "name": "backend",
+    "version": "1.0.0",
+    "description": "Basic express REST API server",
+    "main": "index.js",
+    "scripts": {
+        "test": "cross-env DOTENV_PATH=.env.test NODE_OPTIONS=--experimental-vm-modules jest",
+        "test:supabase": "cross-env DOTENV_PATH=.env.dev NODE_OPTIONS=--experimental-vm-modules jest",
+        "dev": "cross-env DOTENV_PATH=.env node index.js",
+        "dev:test": "cross-env DOTENV_PATH=.env.dev node index.js",
+        "ingest:test": "cross-env DOTENV_PATH=.env.dev node scripts/ingest.js",
+        "ingest:prod": "cross-env DOTENV_PATH=.env node scripts/ingest.js",
+        "migrate:local": "cross-env DOTENV_PATH=.env.test node scripts/migrate.js",
+        "migrate:test": "cross-env DOTENV_PATH=.env.dev node scripts/migrate.js",
+        "migrate:prod": "cross-env DOTENV_PATH=.env node scripts/migrate.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/izynegallardo/watchuwanime.git"
+    },
+    "keywords": [],
+    "author": "izynehowiedev",
+    "license": "MIT",
+    "type": "module",
+    "bugs": {
+        "url": "https://github.com/izynegallardo/watchuwanime/issues"
+    },
+    "homepage": "https://github.com/izynegallardo/watchuwanime/backend#readme",
+    "dependencies": {
+        "@huggingface/transformers": "^4.2.0",
+        "@supabase/supabase-js": "^2.112.4",
+        "cookie-parser": "^1.4.7",
+        "cors": "^2.8.6",
+        "csv-parse": "^7.0.2",
+        "dotenv": "^17.4.2",
+        "express": "^5.2.1",
+        "express-rate-limit": "^8.6.2",
+        "morgan": "^1.11.0",
+        "openai": "^7.5.0",
+        "zod": "^4.4.3"
+    },
+    "devDependencies": {
+        "cross-env": "^10.1.0",
+        "jest": "^30.4.2",
+        "pg": "^8.23.0",
+        "supertest": "^7.2.2"
+    }
+}
