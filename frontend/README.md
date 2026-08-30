@@ -1,4 +1,4 @@
-# vanilla-spa
+# Watchuwanime: Frontend
 
 Single-Page Application (SPA) built with vanilla JavaScript boilerplate,
 
