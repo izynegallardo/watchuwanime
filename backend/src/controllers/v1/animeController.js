@@ -8,8 +8,8 @@ import { responseError } from '../../utils/error.js'
 const RESULT_COUNT = 10
 const CANDIDATE_POOL_SIZE = RESULT_COUNT * 5
 
-// Which ranking factors apply on top of raw similarity. Empty array skips
-// reranking entirely and falls back to pure similarity order.
+// Which ranking factors apply on top of raw similarity.
+// Empty array skips reranking entirely and falls back to pure similarity order.
 const ENABLED_RANK_FACTORS = ['duration', 'quality', 'status']
 
 function buildQueryText(answers) {
