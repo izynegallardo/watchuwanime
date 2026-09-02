@@ -67,14 +67,14 @@ This project runs against three separate database targets, selected by which
 env file is loaded (`DOTENV_PATH`). Never point anything except `migrate:prod`
 / `ingest:prod` / `dev` at the production file.
 
-| File                | Target                                   | Committed? |
-| ------------------- | ---------------------------------------- | ---------- |
-| `.env.example`      | Template for `.env`                      | Yes        |
-| `.env`              | Production Supabase                      | No         |
-| `.env.dev.example`  | Template for `.env.dev`                  | Yes        |
-| `.env.dev`          | Test Supabase (a separate cloud project) | No         |
-| `.env.test.example` | Template for `.env.test`                 | Yes        |
-| `.env.test`         | Local Postgres, used only by Jest        | No         |
+| File                 | Target                                   | Committed? |
+| -------------------- | ---------------------------------------- | ---------- |
+| `.env.example`       | Template for `.env`                      | Yes        |
+| `.env`               | Production Supabase                      | No         |
+| `.env.dev.example`   | Template for `.env.dev`                  | Yes        |
+| `.env.dev`           | Test Supabase (a separate cloud project) | No         |
+| `.env.local.example` | Template for `.env.test`                 | Yes        |
+| `.env.local`         | Local Postgres, used only by Jest        | No         |
 
 **Why three targets:** ingestion and the live app talk to Supabase through
 `supabase-js`, which requires Supabase's PostgREST layer in front of the

@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 
 dotenv.config({ path: process.env.DOTENV_PATH || '.env' })
 
-const { connection } = await import('../src/core/database.js')
+const { pool } = await import('../src/core/database.js')
 
 const migrationsDir = new URL('../migrations/', import.meta.url)
 
@@ -13,10 +13,10 @@ async function migrate() {
     for (const file of files) {
         const sql = await readFile(new URL(file, migrationsDir), 'utf-8')
         console.log(`Running migration: ${file}`)
-        await connection.query(sql)
+        await pool.query(sql)
     }
 
-    await connection.end()
+    await pool.end()
     console.log('Migrations complete.')
 }
 

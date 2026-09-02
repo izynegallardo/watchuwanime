@@ -4,13 +4,13 @@
     "description": "Basic express REST API server",
     "main": "index.js",
     "scripts": {
-        "test": "cross-env DOTENV_PATH=.env.test NODE_OPTIONS=--experimental-vm-modules jest",
+        "test": "cross-env DOTENV_PATH=.env.local NODE_OPTIONS=--experimental-vm-modules jest",
         "test:supabase": "cross-env DOTENV_PATH=.env.dev NODE_OPTIONS=--experimental-vm-modules jest",
-        "dev": "cross-env DOTENV_PATH=.env node index.js",
-        "dev:test": "cross-env DOTENV_PATH=.env.dev node index.js",
+        "start": "cross-env DOTENV_PATH=.env node index.js",
+        "dev": "cross-env DOTENV_PATH=.env.dev node index.js",
         "ingest:test": "cross-env DOTENV_PATH=.env.dev node scripts/ingest.js",
         "ingest:prod": "cross-env DOTENV_PATH=.env node scripts/ingest.js",
-        "migrate:local": "cross-env DOTENV_PATH=.env.test node scripts/migrate.js",
+        "migrate:local": "cross-env DOTENV_PATH=.env.local node scripts/migrate.js",
         "migrate:test": "cross-env DOTENV_PATH=.env.dev node scripts/migrate.js",
         "migrate:prod": "cross-env DOTENV_PATH=.env node scripts/migrate.js"
     },

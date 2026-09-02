@@ -1,7 +1,7 @@
-drop function if exists match_anime(public.vector(384), float, int, bigint[]);
+drop function if exists match_anime(extensions.vector(384), float, int, bigint[]);
 
 create or replace function match_anime (
-  query_embedding public.vector(384),
+  query_embedding extensions.vector(384),
   match_threshold float,
   match_count int,
   exclude_ids bigint[] default '{}'
@@ -23,7 +23,7 @@ returns table (
   duration_minutes integer,
   episodes integer,
   total_minutes integer,
-  embedding public.vector(384),
+  embedding extensions.vector(384),
   similarity float
 )
 language sql stable
