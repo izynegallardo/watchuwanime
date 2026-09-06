@@ -6,12 +6,13 @@
     "scripts": {
         "test": "cross-env DOTENV_PATH=.env.local NODE_OPTIONS=--experimental-vm-modules jest",
         "test:supabase": "cross-env DOTENV_PATH=.env.dev NODE_OPTIONS=--experimental-vm-modules jest",
+        "dev": "cross-env DOTENV_PATH=.env.dev nodemon index.js",
         "start": "cross-env DOTENV_PATH=.env node index.js",
-        "dev": "cross-env DOTENV_PATH=.env.dev node index.js",
-        "ingest:test": "cross-env DOTENV_PATH=.env.dev node scripts/ingest.js",
+        "ingest:local": "cross-env DOTENV_PATH=.env.local node scripts/ingest.js",
+        "ingest:dev": "cross-env DOTENV_PATH=.env.dev node scripts/ingest.js",
         "ingest:prod": "cross-env DOTENV_PATH=.env node scripts/ingest.js",
         "migrate:local": "cross-env DOTENV_PATH=.env.local node scripts/migrate.js",
-        "migrate:test": "cross-env DOTENV_PATH=.env.dev node scripts/migrate.js",
+        "migrate:dev": "cross-env DOTENV_PATH=.env.dev node scripts/migrate.js",
         "migrate:prod": "cross-env DOTENV_PATH=.env node scripts/migrate.js"
     },
     "repository": {
@@ -26,6 +27,10 @@
         "url": "https://github.com/izynegallardo/watchuwanime/issues"
     },
     "homepage": "https://github.com/izynegallardo/watchuwanime/backend#readme",
+    "overrides": {
+        "adm-zip": "0.6.0",
+        "sharp": "0.35.4"
+    },
     "dependencies": {
         "@huggingface/transformers": "^4.2.0",
         "@supabase/supabase-js": "^2.112.4",
@@ -42,6 +47,7 @@
     "devDependencies": {
         "cross-env": "^10.1.0",
         "jest": "^30.4.2",
+        "nodemon": "^3.1.14",
         "pg": "^8.23.0",
         "supertest": "^7.2.2"
     }

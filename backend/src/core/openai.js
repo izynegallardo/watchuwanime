@@ -1,10 +1,18 @@
 import { OpenAI } from 'openai/client.js'
 
-if (!process.env.AI_API_KEY) {
-    throw new Error('AI Provider API key is missing or invalid.')
-}
+let client = null
 
-export const openai = new OpenAI({
-    baseURL: process.env.AI_API_BASE_URL,
-    apiKey: process.env.AI_API_KEY,
-})
+export function getOpenAIClient() {
+    if (client) return client
+
+    if (!process.env.AI_API_KEY) {
+        throw new Error('AI Provider API key is missing or invalid.')
+    }
+
+    client = new OpenAI({
+        baseURL: process.env.AI_API_BASE_URL,
+        apiKey: process.env.AI_API_KEY,
+    })
+
+    return client
+}

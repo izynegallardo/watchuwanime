@@ -5,7 +5,7 @@ export default function Main(root) {
         <div class="${styles.intro}">
             <div class="${styles.introLabel}">
                 <span class="${styles.label}">
-                    WHAT ANIME YOU WANT
+                    WATCH THE ANIME YOU WANT
                 </span>
             </div>
 
@@ -19,7 +19,7 @@ export default function Main(root) {
 
             <p class="${styles.description}">
                 Stop wasting time finding your next favorite anime. 
-                Just answer a few questions, and Watchuwanime will recommend one for you.
+                Answer a few questions, and we will recommend one for you.
             </p>
         </div>
 

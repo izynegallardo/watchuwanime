@@ -1,19 +1,31 @@
+drop table if exists anime;
+
 create table anime (
   id bigserial primary key,
-  mal_id integer unique not null,
+  pahe_id text unique not null,
   title text not null,
-  title_english text,
+  title_romaji text,
   title_japanese text,
+  title_spanish text,
+  title_french text,
+  synonyms text[],
   type text,
-  year integer,
+  aired_from date,
+  aired_to date,
+  year integer generated always as (extract(year from aired_from)::int) stored,
+  season text,
   genres text[],
-  synopsis text,
-  rating text,
-  score numeric,
-  popularity integer,
+  themes text[],
+  demographics text[],
+  studios text[],
+  summary text,
   status text,
   is_airing boolean,
   image_url text,
+  youtube_url text,
+  external_links jsonb,
+  relations jsonb,
+  recommendations jsonb,
   duration_minutes integer,
   episodes integer,
   total_minutes integer generated always as (duration_minutes * coalesce(episodes, 1)) stored,
@@ -24,3 +36,4 @@ create table anime (
 SET maintenance_work_mem = '512MB';
 
 create index on anime using hnsw (embedding vector_cosine_ops);
+create index on anime using gin (genres);

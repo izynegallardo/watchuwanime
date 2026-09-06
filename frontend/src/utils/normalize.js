@@ -9,6 +9,18 @@ const ESCAPE_MAP = {
     "'": '&#39;',
 }
 
-export function escapeHtml(value) {
+export function normalizeHTML(value) {
     return String(value ?? '').replace(/[&<>"']/g, (char) => ESCAPE_MAP[char])
+}
+
+export function normalizeDate(date) {
+    if (!date) return ''
+
+    const [year, month, day] = date.split('-')
+
+    return new Date(Number(year), Number(month) - 1, Number(day)).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    })
 }

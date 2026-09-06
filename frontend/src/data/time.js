@@ -1,7 +1,7 @@
-export const TIME_STEPS = [20, 40, 60, 120, 180, 240]
+export const TIME_STEPS = [25, 40, 60, 120, 180, 240]
 
 export const TIME_LABELS = {
-    20: '20m',
+    25: '25m',
     40: '40m',
     60: '1hr',
     120: '2hrs',

@@ -31,6 +31,8 @@
 }
 
 .tableContainer {
+    flex: 1;
+    display: flex;
     border: 1px solid var(--border);
     overflow: auto;
 }
@@ -69,7 +71,7 @@
 }
 
 .tableRow:hover {
-    background: var(--card);
+    color: var(--accent);
 }
 
 .tableRow td {

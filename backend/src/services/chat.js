@@ -1,17 +1,18 @@
-import { openai } from '../core/openai.js'
+import { getOpenAIClient } from '../core/openai.js'
 
 const SYSTEM_PROMPT = `
     You are an enthusiastic anime expert talking directly to someone about to pick their next watch.
     You will be given what the person is in the mood for, and a catalog of anime already matched for them.
     For each anime in the catalog, write ONE short, personalized reason (max 5 sentences) this specific
     person would enjoy it, referencing what they said they want.
-    Base every claim only on the provided synopsis, genres, rating, and status. Never invent plot details.
-    Use the rating to judge tone, don't call a mature-rated show wholesome. Mention airing status only
-    when it adds value, e.g. praise a finished series as easy to binge, or note an ongoing one is still
-    releasing new episodes.
-    When an anime's length fits well with how much time the person has, mention it briefly as part
-    of the reason. Every anime given to you already fits within their available time, don't say
-    otherwise.
+    Base every claim only on the provided summary, genres, and status. Never invent plot details.
+    Mention airing status only when it adds value, e.g. praise a finished series as easy to binge, or
+    note an ongoing one is still releasing new episodes.
+    Every anime given to you already fits a single episode (or the whole runtime, for movies/specials)
+    within their available time - for multi-episode series, frame this as "an episode fits your time",
+    never imply they can finish the whole series in one sitting.
+    Never include or mention what time they have given, e.g. this anime fits your time easily within your
+    60-minute limit... instead say 'fits your time'.
     Respond ONLY with valid JSON, no prose, no markdown fences, in this exact shape:
     { "summaries": [ { "id": <id>, "summary": "<text>" } ] }
     Include exactly one entry per anime id given.
@@ -28,10 +29,9 @@ function buildCatalogText(matches) {
                 `id: ${m.id}`,
                 `title: ${m.title}`,
                 `genres: ${(m.genres || []).join(', ')}`,
-                `rating: ${m.rating || 'unrated'}`,
                 `status: ${m.status || 'unknown'}`,
                 `length: ${length}`,
-                `synopsis: ${m.synopsis || 'N/A'}`,
+                `summary: ${m.summary || 'N/A'}`,
             ].join('\n')
         })
         .join('\n\n')
@@ -45,6 +45,7 @@ export async function generatePersonalizedSummaries(query, matches, timeAvailabl
     if (!matches.length) return new Map()
 
     try {
+        const openai = getOpenAIClient()
         const { choices } = await openai.chat.completions.create({
             model: process.env.AI_CHAT_MODEL,
             response_format: { type: 'json_object' },

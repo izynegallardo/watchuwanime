@@ -63,4 +63,25 @@ describe('recommendSchema', () => {
         expect(result.success).toBe(true)
         expect(result.data.excludeIds).toEqual([1, 2, 3])
     })
+
+    it('defaults allowMatureGenres to false when omitted', () => {
+        const result = recommendSchema.safeParse({
+            answers: [{ answer: 'Something fun' }],
+            timeAvailable: 60,
+        })
+
+        expect(result.success).toBe(true)
+        expect(result.data.allowMatureGenres).toBe(false)
+    })
+
+    it('passes through allowMatureGenres when explicitly set', () => {
+        const result = recommendSchema.safeParse({
+            answers: [{ answer: 'Something fun' }],
+            timeAvailable: 60,
+            allowMatureGenres: true,
+        })
+
+        expect(result.success).toBe(true)
+        expect(result.data.allowMatureGenres).toBe(true)
+    })
 })

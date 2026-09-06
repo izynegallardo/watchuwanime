@@ -9,6 +9,11 @@ export { setIndex }
 
 let lastDirection = 1
 
+// Trailer state is page-local (not in the shared store) - it's purely a
+// per-view UI toggle, reset back to the poster whenever the visible anime
+// changes so the trailer never lingers onto the next card.
+const [showTrailer, setShowTrailer, subscribeShowTrailer] = useState(false)
+
 export default function Events() {
     try {
         function navigate(direction) {
@@ -16,6 +21,7 @@ export default function Events() {
             if (total <= 1) return
 
             lastDirection = direction
+            setShowTrailer(false)
 
             setIndex((prev) => {
                 const next = prev + direction
@@ -29,6 +35,7 @@ export default function Events() {
             if (targetIndex === index()) return
 
             lastDirection = targetIndex > index() ? 1 : -1
+            setShowTrailer(false)
             setIndex(targetIndex)
         }
 
@@ -36,7 +43,7 @@ export default function Events() {
             document.querySelector('#result-content').innerHTML = `
                 <div class='${styles.empty}'>
                     <p class='${styles.emptyText}'>
-                        NO RECOMMENDATIONS YET
+                        NO MORE RECOMMENDATIONS
                     </p>
                     <a class='${styles.emptyLink}' href='/'>
                         START OVER
@@ -74,7 +81,7 @@ export default function Events() {
 
                 <div class='${styles.content}'>
                     <div class='${styles.animeCardWrapper} ${directionClass}'>
-                        ${AnimeCard(anime, currentIndex, total)}
+                        ${AnimeCard(anime, currentIndex, total, showTrailer())}
                     </div>
 
                     <div class='${styles.navigation}'>
@@ -124,6 +131,10 @@ export default function Events() {
                 .querySelector('[data-action="next"]')
                 .addEventListener('click', () => navigate(1))
 
+            document
+                .querySelector('[data-action="toggle-trailer"]')
+                ?.addEventListener('click', () => setShowTrailer((prev) => !prev))
+
             document.querySelectorAll('[data-index]').forEach((button) => {
                 button.addEventListener('click', () => goTo(Number(button.dataset.index)))
             })
@@ -133,14 +144,17 @@ export default function Events() {
 
         const unsubscribeRecommendations = subscribeRecommendations(() => {
             lastDirection = 1
+            setShowTrailer(false)
             setIndex(0)
             render()
         })
         const unsubscribeIndex = subscribeIndex(render)
+        const unsubscribeShowTrailer = subscribeShowTrailer(render)
 
         return () => {
             unsubscribeRecommendations()
             unsubscribeIndex()
+            unsubscribeShowTrailer()
         }
     } catch (error) {
         console.log('Result Page Event:', error)

@@ -2,6 +2,7 @@ import styles from './component.module.css'
 import {
     viewerCount,
     timeIndex,
+    allowMatureGenres,
     selectedGenres,
     setSelectedGenres,
     subscribeSelectedGenres,
@@ -36,7 +37,7 @@ export default function Events() {
         function renderTextArea() {
             const textareaEl = document.querySelector('#text-area')
 
-            const randIndex = getRandomInt(0, PLACEHOLDERS.length)
+            const randIndex = getRandomInt(0, PLACEHOLDERS.length - 1)
             const placeholder = PLACEHOLDERS[randIndex]
 
             textareaEl.innerHTML = `
@@ -113,7 +114,7 @@ export default function Events() {
                 ]
                 setSessionAnswers(allAnswers)
 
-                fetchRecommendations(allAnswers, TIME_STEPS[timeIndex()])
+                fetchRecommendations(allAnswers, TIME_STEPS[timeIndex()], [], allowMatureGenres())
                     .then((data) => {
                         setRecommendations(data)
                         setShownIds(data.map((anime) => anime.id))

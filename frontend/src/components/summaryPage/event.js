@@ -1,6 +1,7 @@
 import styles from './component.module.css'
 import {
     timeIndex,
+    allowMatureGenres,
     recommendations,
     setRecommendations,
     shownIds,
@@ -121,7 +122,7 @@ export default function Events() {
             moreButton.disabled = true
             moreButton.textContent = 'LOADING...'
 
-            fetchRecommendations(sessionAnswers(), TIME_STEPS[timeIndex()], shownIds())
+            fetchRecommendations(sessionAnswers(), TIME_STEPS[timeIndex()], shownIds(), allowMatureGenres())
                 .then((data) => {
                     setRecommendations(data)
                     setShownIds((prev) => [...prev, ...data.map((anime) => anime.id)])

@@ -78,6 +78,8 @@
     flex: 1;
     display: flex;
     border: 1px solid var(--border);
+    min-height: 720px;
+    max-height: 720px;
     animation: slideInRight 0.25s ease both;
 }
 

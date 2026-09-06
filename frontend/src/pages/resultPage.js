@@ -9,7 +9,7 @@ export default function ResultPage() {
 
     Header(header)
     Main(main)
-    Footer(footer)
+    // Footer(footer)
 
     return Events()
 }
