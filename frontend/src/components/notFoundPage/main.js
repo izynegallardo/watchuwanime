@@ -1,15 +1,15 @@
 import styles from './component.module.css'
+import EyeGlasses from '@/assets/wired-outline-243-glasses-hover-searching.gif'
 
 export default function Main(root) {
     root.innerHTML = `
-        <div class="${styles['notFoundPage-div']}">
-            <section class="${styles['notFoundPage-section']}">
-                <main>
-                    <h1>Page not found</h1>
-                </main>
-            </section>
-        </div>
+        <section class='${styles.notFoundSection}'>
+            <img src="${EyeGlasses}" alt="Eye Glasses">
+            <h1>404</h1>
+            <h2>Oops... Page not found</h2>
+            <a href='/'>Go back</a>
+        </section>
     `
 
-    root.className = styles['notFoundPage']
+    root.className = styles.notFound
 }

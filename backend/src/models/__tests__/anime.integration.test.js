@@ -84,11 +84,11 @@ const SENTINEL_TITLES = [
 ]
 
 function sentinelPaheId(suffix) {
-    return `test-sentinel-${suffix}`
+    return `test-sentinel-integration-${suffix}`
 }
 
 async function cleanupSentinelRows() {
-    await pool.query("DELETE FROM anime WHERE pahe_id LIKE 'test-sentinel-%'")
+    await pool.query("DELETE FROM anime WHERE pahe_id LIKE 'test-sentinel-integration-%'")
 }
 
 describe('anime schema + match_anime()', () => {

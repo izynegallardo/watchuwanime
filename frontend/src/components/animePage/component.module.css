@@ -1,0 +1,57 @@
+.anime {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.anime .content {
+    width: 100%;
+    padding: 2rem;
+}
+
+.anime .animeCardWrapper {
+    display: flex;
+    border: 1px solid var(--border);
+    min-height: 720px;
+    max-height: 100%;
+}
+
+.anime .status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.anime .statusText {
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+}
+
+.anime .statusLink {
+    padding: 6px 12px;
+    background: var(--primary);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 0.875rem;
+    letter-spacing: 0.1em;
+}
+
+.anime .statusLink:hover {
+    text-decoration: none;
+    opacity: 0.8;
+}
+
+@media (max-width: 480px) {
+    .anime .animeCardWrapper {
+        min-height: 1130px;
+    }
+}

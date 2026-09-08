@@ -13,3 +13,11 @@ export const recommendSchema = z.object({
     // future mature genre added to MATURE_GENRES in animeController.js) is allowed.
     allowMatureGenres: z.boolean().optional().default(false),
 })
+
+export const animeIdParamSchema = z.object({
+    id: z.coerce.number().int().positive(),
+})
+
+export const animePaheIdParamSchema = z.object({
+    paheId: z.string().min(1),
+})

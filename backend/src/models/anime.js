@@ -30,9 +30,17 @@ class Anime {
     async #createRemote(records) {
         try {
             const { supabase } = await import('../core/supabase.js')
+            // Sending a raw JS array here leaves Postgres/PostgREST to guess
+            // whether it means a native array literal or a vector literal -
+            // explicit string conversion (same as the local path already
+            // does for `pg`) removes that ambiguity entirely.
+            const payload = records.map((record) => ({
+                ...record,
+                embedding: toVectorLiteral(record.embedding),
+            }))
             const results = await supabase
                 .from('anime')
-                .upsert(records, { onConflict: 'pahe_id' })
+                .upsert(payload, { onConflict: 'pahe_id' })
                 .select()
 
             if (results.error)
@@ -143,7 +151,9 @@ class Anime {
         try {
             const { supabase } = await import('../core/supabase.js')
             const results = await supabase.rpc('match_anime', {
-                query_embedding: embedding,
+                // Same reasoning as #createRemote - explicit vector literal
+                // instead of a raw array, so the RPC parameter is unambiguous.
+                query_embedding: toVectorLiteral(embedding),
                 match_threshold: matchThreshold,
                 match_count: matchCount,
                 exclude_ids: excludeIds,
@@ -164,10 +174,37 @@ class Anime {
     }
 
     /**
-     * Looks up anime by pahe_id, used only as the last-resort backfill when
-     * vector search + threshold relaxing still can't fill RESULT_COUNT - pulls
-     * candidates referenced in already-matched anime's relations/recommendations.
-     * No embedding needed here, these rows aren't reranked, just appended.
+     * Looks up a single anime by internal id - used for the animePage detail
+     * view and as the source row for the relations endpoint (we need its own
+     * `relations` column before we can hydrate what it points to).
+     */
+    async findById(id) {
+        try {
+            if (this.isLocal) {
+                const { pool } = await import('../core/database.js')
+                const result = await pool.query('select * from anime where id = $1', [id])
+                return result.rows[0] ?? null
+            }
+
+            const { supabase } = await import('../core/supabase.js')
+            const results = await supabase.from('anime').select('*').eq('id', id).maybeSingle()
+
+            if (results.error)
+                throw new Error(`Failed to find anime by id: ${JSON.stringify(results.error)}`)
+
+            return results.data
+        } catch (error) {
+            console.error('<error> anime.findById', error)
+            throw error
+        }
+    }
+
+    /**
+     * Looks up anime by pahe_id, used both as the last-resort backfill when
+     * vector search + threshold relaxing still can't fill RESULT_COUNT (pulls
+     * candidates referenced in already-matched anime's relations/recommendations,
+     * no embedding needed there, these rows aren't reranked, just appended),
+     * and to hydrate the relations endpoint's grouped anime list.
      */
     async findByPaheIds(paheIds) {
         if (!paheIds.length) return []

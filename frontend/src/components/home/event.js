@@ -13,6 +13,8 @@ import {
     setSessionAnswers,
     setShownIds,
     setCurrentUserIndex,
+    setSelectedGenres,
+    setAnswer,
 } from '@/store/counter'
 
 export default function Events() {
@@ -20,6 +22,8 @@ export default function Events() {
         setSessionAnswers([])
         setShownIds([])
         setCurrentUserIndex(0)
+        setSelectedGenres([])
+        setAnswer('')
         // console.log('Viewer count:', viewerCount())
 
         function renderForm() {
@@ -102,6 +106,10 @@ export default function Events() {
                 </section>
 
                 <section class="${styles.section}">
+                    <span class="${styles.label} ${styles.sectionNumber}">
+                        03
+                    </span>
+                    
                     <div class="${styles.sectionHeader}">
                         <p class="${styles.sectionTitle}">
                             ALLOW 18+ RESULTS?

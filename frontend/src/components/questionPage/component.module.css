@@ -103,7 +103,7 @@
 }
 
 .question .genreButton {
-    flex: 1 1 10em;
+    flex: 1 1 12em;
 
     padding: 0.375rem 0.75rem;
 
@@ -150,7 +150,7 @@
 
 /* Next button */
 
-.question .nextLink {
+.question .nextButton {
     justify-content: center;
     border: none;
     border-radius: 0;
@@ -168,13 +168,25 @@
         transform 0.1s;
 }
 
-.question .nextLink:hover {
+.question .nextButton:hover {
     text-decoration: none;
     opacity: 0.8;
 }
 
-.question .nextLink:active {
-    transform: scale(0.99);
+.question .nextButton:hover {
+    text-decoration: none;
+    opacity: 0.8;
+}
+
+.question .nextButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.question .genreFieldset {
+    border: 1px solid var(--border);
+    max-height: 240px;
+    overflow: auto;
 }
 
 /* Responsive equivalent of md:text-5xl */

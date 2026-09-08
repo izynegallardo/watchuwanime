@@ -42,7 +42,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-width: 100vw;
+    width: 100vw;
     padding: 1rem 2rem;
     border-bottom: 1px solid var(--border);
 }
@@ -68,9 +68,9 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    max-width: 650px;
+    justify-content: space-between;
+    max-height: 100%;
     width: 100%;
-    height: 100%;
     padding: 2rem;
 }
 
@@ -79,11 +79,17 @@
     display: flex;
     border: 1px solid var(--border);
     min-height: 720px;
-    max-height: 720px;
+    /* pan-y (not none): lets vertical scroll inside the card still work,
+       while leaving horizontal gesture handling to our own touchstart/
+       touchend listeners in event.js instead of the browser's scroll-chain. */
+    touch-action: pan-y;
+}
+
+.result .animeCardWrapper.animate {
     animation: slideInRight 0.25s ease both;
 }
 
-.result .animeCardWrapper.slideInLeft {
+.result .animeCardWrapper.animate.slideInLeft {
     animation-name: slideInLeft;
 }
 
@@ -111,16 +117,16 @@
     }
 }
 
-.navigation {
+.result .navigation {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
+    margin-top: 0.8em;
+    padding-top: 1.5em;
     border-top: 1px solid var(--border);
 }
 
-.navButton {
+.result .navButton {
     border: 0;
     padding: 0;
     background: none;
@@ -132,29 +138,29 @@
     transition: color 0.15s ease;
 }
 
-.prevButton {
+.result .prevButton {
     color: var(--muted-foreground);
 }
 
-.nextButton {
+.result .nextButton {
     color: var(--foreground);
 }
 
-.navButton:hover:not(:disabled) {
+.result .navButton:hover:not(:disabled) {
     color: var(--primary);
 }
 
-.navButton:disabled {
+.result .navButton:disabled {
     cursor: not-allowed;
     opacity: 0.5;
 }
 
-.recommendations {
+.result .recommendations {
     display: flex;
     gap: 0.5rem;
 }
 
-.recommendationButton {
+.result .recommendationButton {
     width: 8px;
     height: 2px;
     padding: 0;
@@ -164,17 +170,17 @@
     transition: all 0.15s ease;
 }
 
-.recommendationButton.active {
+.result .recommendationButton.active {
     width: 24px;
     background: var(--primary);
 }
 
-.viewAll {
-    padding-top: 1rem;
+.result .viewAll {
+    padding-top: 0.8em;
     text-align: center;
 }
 
-.viewAllLink {
+.result .viewAllLink {
     display: block;
     padding: 0;
     border: 0;
@@ -188,6 +194,17 @@
     transition: color 0.15s ease;
 }
 
-.viewAllLink:hover {
+.result .viewAllLink:hover {
     color: var(--primary);
+}
+
+@media (max-width: 480px) {
+    .result .content {
+        min-height: 100svh;
+        max-height: max-content;
+    }
+
+    .result .animeCardWrapper {
+        min-height: 1130px;
+    }
 }

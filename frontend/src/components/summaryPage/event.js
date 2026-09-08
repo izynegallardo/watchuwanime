@@ -12,6 +12,8 @@ import {
 import { TIME_STEPS } from '@/data/time'
 import { fetchRecommendations } from '@/api/anime'
 import { setIndex as setCarouselIndex } from '@/components/resultPage/event'
+import LoadingScreen from '@/components/loadingScreen/main'
+import Main from './main'
 
 const MAX_SHOWN = 30
 
@@ -28,7 +30,8 @@ export default function Events() {
                         <tr class='${styles.tableHeaderRow}'>
                             <th class='${styles.tableHeader}'>#</th>
                             <th class='${styles.tableHeader}'>TITLE</th>
-                            <th class='${styles.tableHeader}'>STATUS</th>
+                            <th class='${styles.tableHeader}'>DURATION</th>
+                            <th class='${styles.tableHeader}'>SEASON</th>
                             <th class='${styles.tableHeader}'>TYPE</th>
                             <th class='${styles.tableHeader}'>GENRES</th>
                         </tr>
@@ -53,7 +56,11 @@ export default function Events() {
                                         </td>
 
                                         <td class='${styles.metaCell}'>
-                                            ${anime.status}
+                                            ${anime.totalMinutes} mins
+                                        </td>
+
+                                        <td class='${styles.metaCell}'>
+                                            ${anime.season}
                                         </td>
 
                                         <td class='${styles.metaCell}'>
@@ -98,9 +105,10 @@ export default function Events() {
                 ${
                     canMore()
                         ? `
-                            <button id='more-button' class='${styles.moreButton}'>
+                            <button id='more-button' class='${styles.moreButton}' type='button'>
                                 MORE RECOMMENDATIONS →
                             </button>
+
                         `
                         : ''
                 }
@@ -112,17 +120,32 @@ export default function Events() {
             }
         }
 
+        function showLoadingScreen() {
+            LoadingScreen(document.querySelector('#main'))
+        }
+
+        function restorePage() {
+            Main(document.querySelector('#main'))
+            renderTable()
+            renderActions()
+        }
+
         let isFetchingMore = false
 
         function handleMore() {
             if (isFetchingMore) return
+            if (!canMore()) return
+
             isFetchingMore = true
 
-            const moreButton = document.querySelector('#more-button')
-            moreButton.disabled = true
-            moreButton.textContent = 'LOADING...'
+            showLoadingScreen()
 
-            fetchRecommendations(sessionAnswers(), TIME_STEPS[timeIndex()], shownIds(), allowMatureGenres())
+            fetchRecommendations(
+                sessionAnswers(),
+                TIME_STEPS[timeIndex()],
+                shownIds(),
+                allowMatureGenres(),
+            )
                 .then((data) => {
                     setRecommendations(data)
                     setShownIds((prev) => [...prev, ...data.map((anime) => anime.id)])
@@ -130,9 +153,9 @@ export default function Events() {
                 })
                 .catch((error) => {
                     console.error('Failed to fetch more recommendations:', error)
+
                     isFetchingMore = false
-                    moreButton.disabled = false
-                    moreButton.textContent = 'MORE RECOMMENDATIONS →'
+                    restorePage()
                 })
         }
 

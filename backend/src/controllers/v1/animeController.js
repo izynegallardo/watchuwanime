@@ -1,5 +1,9 @@
 import Anime from '../../models/anime.js'
-import { recommendSchema } from '../../schemas/animeSchema.js'
+import {
+    recommendSchema,
+    animeIdParamSchema,
+    animePaheIdParamSchema,
+} from '../../schemas/animeSchema.js'
 import { generateEmbedding } from '../../services/embedding.js'
 import { generatePersonalizedSummaries } from '../../services/chat.js'
 import {
@@ -23,6 +27,65 @@ const MATURE_GENRES = ['Ecchi']
 // Which ranking factors apply on top of raw similarity.
 // Empty array skips reranking entirely and falls back to pure similarity order.
 const ENABLED_RANK_FACTORS = ['duration', 'status']
+
+// Display order for the relations tab - matches how sites like AniList group
+// these (direct continuations first, tangential entries like OSTs/parodies
+// last). Anything not listed here falls to the end via relationTypeRank().
+const RELATION_TYPE_ORDER = [
+    'Sequel',
+    'Prequel',
+    'Side Story',
+    'Spin-off',
+    'Alternative Version',
+    'Alternative Setting',
+    'Parent Story',
+    'Full Story',
+    'Summary',
+    'Adaptation',
+    'Character',
+    'Other',
+]
+
+function relationTypeRank(relationType) {
+    const index = RELATION_TYPE_ORDER.indexOf(relationType)
+    return index === -1 ? RELATION_TYPE_ORDER.length : index
+}
+
+// Shared between recommend() and show() so both endpoints return anime in
+// the exact same shape - card/main.js and animePage can then both consume
+// it without caring which endpoint it came from. `overrides` is how
+// recommend() substitutes in the AI-personalized summary; show() has no
+// question context to personalize against, so it just uses the raw fields.
+function mapAnimeDetail(match, overrides = {}) {
+    return {
+        id: match.id,
+        paheId: match.pahe_id,
+        title: match.title,
+        titleRomaji: match.title_romaji,
+        titleJapanese: match.title_japanese,
+        synonyms: match.synonyms,
+        type: match.type,
+        aired_from: match.aired_from,
+        aired_to: match.aired_to,
+        year: match.year,
+        season: match.season,
+        genres: match.genres,
+        themes: match.themes,
+        demographics: match.demographics,
+        studios: match.studios,
+        episodes: match.episodes,
+        durationMinutes: match.duration_minutes,
+        totalMinutes: match.total_minutes,
+        status: match.status,
+        imageUrl: match.image_url,
+        youtubeUrl: match.youtube_url,
+        external_links: match.external_links,
+        summary: match.summary,
+        synopsis: match.summary,
+        relations: match.relations,
+        ...overrides,
+    }
+}
 
 function buildQueryText(answers) {
     return answers
@@ -104,31 +167,9 @@ class AnimeController {
 
             const summaries = await generatePersonalizedSummaries(queryText, matches, timeAvailable)
 
-            const recommendations = matches.map((match) => ({
-                id: match.id,
-                title: match.title,
-                titleRomaji: match.title_romaji,
-                titleJapanese: match.title_japanese,
-                synonyms: match.synonyms,
-                type: match.type,
-                aired_from: match.aired_from,
-                aired_to: match.aired_to,
-                year: match.year,
-                season: match.season,
-                genres: match.genres,
-                themes: match.themes,
-                demographics: match.demographics,
-                studios: match.studios,
-                episodes: match.episodes,
-                durationMinutes: match.duration_minutes,
-                totalMinutes: match.total_minutes,
-                status: match.status,
-                imageUrl: match.image_url,
-                youtubeUrl: match.youtube_url,
-                external_links: match.external_links,
-                summary: summaries.get(match.id) ?? match.summary,
-                synopsis: match.summary,
-            }))
+            const recommendations = matches.map((match) =>
+                mapAnimeDetail(match, { summary: summaries.get(match.id) ?? '' }),
+            )
 
             response.status(200).json({
                 success: true,
@@ -173,6 +214,90 @@ class AnimeController {
         }
 
         return result
+    }
+
+    /**
+     * GET /:id/relations - lazily resolved, only called by the frontend when
+     * the person actually opens the Relations tab for a given anime. Reads
+     * that anime's own `relations` pointers (pahe_id + relation_type only),
+     * then hydrates each into full display data via a join against our own
+     * table (see findByPaheIds) rather than trusting anything denormalized
+     * in the dataset itself - keeps this always in sync with what we've
+     * actually ingested, with zero extra dataset/ingestion work.
+     */
+    async relations(request, response) {
+        try {
+            const { id } = animeIdParamSchema.parse(request.params)
+
+            const source = await this.anime.findById(id)
+            if (!source) {
+                return response.status(404).json({ success: false, message: 'Anime not found' })
+            }
+
+            const relationRefs = source.relations ?? []
+            if (!relationRefs.length) {
+                return response.status(200).json({ success: true, relations: [] })
+            }
+
+            const relationTypeByPaheId = new Map(
+                relationRefs.map((ref) => [ref.pahe_id, ref.relation_type || 'Other']),
+            )
+            const hydrated = await this.anime.findByPaheIds([...relationTypeByPaheId.keys()])
+
+            const grouped = new Map()
+            for (const related of hydrated) {
+                const relationType = relationTypeByPaheId.get(related.pahe_id) || 'Other'
+                if (!grouped.has(relationType)) grouped.set(relationType, [])
+
+                grouped.get(relationType).push({
+                    id: related.id,
+                    paheId: related.pahe_id,
+                    title: related.title,
+                    titleRomaji: related.title_romaji,
+                    type: related.type,
+                    episodes: related.episodes,
+                    status: related.status,
+                    season: related.season,
+                    imageUrl: related.image_url,
+                })
+            }
+
+            const relations = [...grouped.entries()]
+                .sort(([a], [b]) => relationTypeRank(a) - relationTypeRank(b))
+                .map(([relationType, anime]) => ({ relationType, anime }))
+
+            response.status(200).json({ success: true, relations })
+        } catch (error) {
+            responseError(response, error)
+        }
+    }
+
+    /**
+     * GET /:paheId - the animePage detail view. Keyed by pahe_id rather
+     * than the internal bigint id, since the id is sequential and
+     * trivially guessable/enumerable in a URL a person can see and share;
+     * pahe_id carries no positional information. No AI summary is computed
+     * here (that only makes sense against a question's context, which this
+     * endpoint doesn't have) - synopsis is explicitly nulled out too,
+     * otherwise it'd duplicate the identical raw text mapAnimeDetail's
+     * default already put in `summary`, and the card would render the same
+     * paragraph twice.
+     */
+    async show(request, response) {
+        try {
+            const { paheId } = animePaheIdParamSchema.parse(request.params)
+
+            const [found] = await this.anime.findByPaheIds([paheId])
+            if (!found) {
+                return response.status(404).json({ success: false, message: 'Anime not found' })
+            }
+
+            response
+                .status(200)
+                .json({ success: true, anime: mapAnimeDetail(found, { synopsis: null }) })
+        } catch (error) {
+            responseError(response, error)
+        }
     }
 }
 

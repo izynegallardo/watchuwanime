@@ -15,3 +15,13 @@ export async function fetchRecommendations(
 
     return response.data.recommendations
 }
+
+export async function fetchAnimeRelations(id) {
+    const response = await apiClient.get(`/anime/${id}/relations`)
+    return response.data.relations
+}
+
+export async function fetchAnimeByPaheId(paheId) {
+    const response = await apiClient.get(`/anime/${paheId}`)
+    return response.data.anime
+}

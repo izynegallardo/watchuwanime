@@ -16,13 +16,13 @@ export default function Main(root) {
 
         <div id='text-area'></div>
 
-        <div>
-            <label class='${styles.formlabel} ${styles.genreLabel}'>
+        <fieldset class='${styles.genreFieldset}'>
+            <legend class='${styles.formlabel} ${styles.genreLabel}'>
                 GENRE PREFERENCES (OPTIONAL)
-            </label>
+            </legend>
 
             <div id='genre-list' class='${styles.genreList}'></div>
-        </div>
+        </fieldset>
 
         <div id='form-footer' class='${styles.formFooter}'></div>
     `

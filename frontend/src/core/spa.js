@@ -13,10 +13,11 @@ class SPA {
         }
     }
 
-    add(path, cb) {
+    add(path, cb, options = {}) {
         this.routes.push({
             key: path,
             callback: cb.bind(this.context),
+            guard: options.guard,
         })
     }
 
@@ -43,6 +44,17 @@ class SPA {
         this.currentCleanup = null
 
         const route = this.get(path)
+
+        // Block direct URL access / refresh / back-forward into a page whose
+        // required state was never set (e.g. jumping straight to /results
+        // without having gone through /questions). Uses replaceState so the
+        // blocked URL doesn't linger in history and get hit again on back.
+        if (typeof route?.guard === 'function' && !route.guard()) {
+            history.replaceState({}, '', '/')
+            this.execute('/')
+            return
+        }
+
         let params
 
         if (route?.key && route?.key instanceof RegExp) {

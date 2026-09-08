@@ -7,17 +7,17 @@
 
 .animeCardTop {
     display: flex;
+    flex: 0 1 auto;
     align-items: flex-start;
     gap: 1.5rem;
     padding: 1.5rem;
-    border-bottom: 2px solid var(--primary);
 }
 
 .animeCardImage {
     position: relative;
     flex-shrink: 0;
     width: 40%;
-    max-width: 220px;
+    max-width: 157px;
     aspect-ratio: 2 / 3;
     background: var(--muted);
     overflow: hidden;
@@ -48,6 +48,26 @@
     background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 50%);
 }
 
+.animeCardTrailerWrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex-shrink: 0;
+    background: #000;
+}
+
+.animeCardTrailerBar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.5rem;
+}
+
+.animeCardTrailerVideo {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+}
+
 .animeCardTrailer {
     position: absolute;
     inset: 0;
@@ -57,13 +77,35 @@
     background: #000;
 }
 
+.animeCardTrailerClose {
+    padding: 0.25rem 0.625rem;
+    border: 1px solid var(--border);
+
+    background: transparent;
+    color: #fff;
+
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+
+    cursor: pointer;
+    transition:
+        background-color 200ms ease,
+        border-color 200ms ease;
+}
+
+.animeCardTrailerClose:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
 .animeCardTrailerToggle {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: 1em;
+    right: 0;
     z-index: 1;
 
-    padding: 0.25rem 0.625rem;
+    padding: 0.25em 0.625em;
     border: 1px solid var(--border);
 
     background: rgba(0, 0, 0, 0.6);
@@ -115,13 +157,47 @@
     display: flex;
     flex: 1;
     flex-direction: column;
+    justify-content: space-between;
     min-width: 0;
     height: 100%;
+    overflow-y: auto;
     text-align: left;
+}
+
+.animeCardTabs {
+    display: flex;
+    flex-shrink: 0;
+    gap: 1.5em;
+    padding: 0.3em 1.5em;
+}
+
+.animeCardTab {
+    margin-bottom: -2px;
+    padding: 0.75rem 0;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: color 150ms ease;
+}
+
+.animeCardTab:hover {
+    color: var(--foreground);
+}
+
+.animeCardTabActive {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
 }
 
 .animeCardBody {
     flex: 1;
+    display: flex;
+    flex-direction: column;
     padding: 1.5rem;
     text-align: left;
     overflow: auto;
@@ -167,6 +243,10 @@
     margin-bottom: 0.5em;
 }
 
+.noMargin {
+    margin: 0;
+}
+
 .animeCardTags a {
     background-color: var(--primary);
     color: #fff;
@@ -200,6 +280,7 @@
     margin-top: 0.75rem;
     padding-top: 0.75rem;
     border-top: 1px solid var(--border);
+    height: 100%;
     color: var(--muted-foreground);
     font-size: 0.8125rem;
     line-height: 1.6;
@@ -210,19 +291,38 @@
     .animeCardTop {
         flex-direction: column;
         align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        max-height: 100%;
     }
 
     .animeCardImage {
-        width: 60%;
+        width: 100%;
+        max-width: 168px;
     }
 
-    .animeCardTitleRow,
+    .animeCardTitle,
+    .animeCardSubTitle,
+    .animeCardYear {
+        align-self: center;
+        text-align: center;
+    }
+
+    .animeCardTitle {
+        font-size: 1.125rem;
+    }
+
     .animeCardTags {
-        align-items: center;
-        text-align: center;
+        justify-content: center;
+        gap: 0.375rem;
     }
 
-    .animeCardInfo {
-        text-align: center;
+    .animeCardTag {
+        padding: 0.0625rem 0.375rem;
+        font-size: 0.6875rem;
+    }
+
+    .animeCardBody {
+        min-height: auto;
     }
 }

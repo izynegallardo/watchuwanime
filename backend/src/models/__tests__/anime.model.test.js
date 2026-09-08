@@ -21,13 +21,17 @@ function unitVector(index) {
 // pahe_id is free-form text (UUID-shaped in the real dataset), unlike mal_id
 // there's no numeric range to reserve for fixtures. A distinctive prefix
 // serves the same purpose: trivially identifiable, never collides with a
-// genuinely ingested pahe_id.
+// genuinely ingested pahe_id. Suffixed with "model" (distinct from
+// anime.integration.test.js's "test-sentinel-integration-") so this file's
+// cleanup can never delete rows another test file is mid-test with, even if
+// Jest ever runs test files in parallel again against this same shared,
+// persistent database.
 function sentinelPaheId(suffix) {
-    return `test-sentinel-${suffix}`
+    return `test-sentinel-model-${suffix}`
 }
 
 async function cleanupSentinelRows() {
-    await pool.query("DELETE FROM anime WHERE pahe_id LIKE 'test-sentinel-%'")
+    await pool.query("DELETE FROM anime WHERE pahe_id LIKE 'test-sentinel-model-%'")
 }
 
 describeIfRemote('Anime model (integration, via supabase-js)', () => {
@@ -100,5 +104,28 @@ describeIfRemote('Anime model (integration, via supabase-js)', () => {
 
         const found = await anime.findByPaheIds([paheId, sentinelPaheId('does-not-exist')])
         expect(found.map((r) => r.title)).toEqual(['Model FindByPaheIds'])
+    })
+
+    it('findById() looks up a single row by internal id, used by the relations endpoint', async () => {
+        const anime = new Anime()
+
+        const [{ id }] = await anime.create([
+            {
+                pahe_id: sentinelPaheId('104'),
+                title: 'Model FindById',
+                content: 'content',
+                embedding: unitVector(8),
+            },
+        ])
+
+        const found = await anime.findById(id)
+        expect(found?.title).toBe('Model FindById')
+    })
+
+    it('findById() returns null for an id that does not exist', async () => {
+        const anime = new Anime()
+
+        const found = await anime.findById(0)
+        expect(found).toBeNull()
     })
 })

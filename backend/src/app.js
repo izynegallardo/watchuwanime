@@ -1,17 +1,18 @@
 import express from 'express'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
-import bodyParser from 'body-parser'
 import morgan from 'morgan'
 
 import v1 from './routes/v1/index.js'
 
 const app = express()
 
+app.get('/healthz', (request, response) => response.status(200).send('ok'))
+
 app.use(morgan('dev'))
 app.use(cookieParser())
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
 
 const allowedOrigins = process.env.FRONTEND_URLS.split(',').map((url) => url.trim())
 
