@@ -4,5 +4,4 @@ node_modules
 .env.local
 .env.test
 .env.dev
-package-lock.json
 data
