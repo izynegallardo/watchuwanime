@@ -1,6 +1,9 @@
 import '@/styles/common.css'
 import SPA from '@/core/spa'
 import { requireRecommendations } from '@/core/routeGuard'
+import { inject } from '@vercel/analytics'
+
+inject()
 
 import NotFoundPage from '@/pages/notFoundPage'
 import HomePage from '@/pages/homePage'
