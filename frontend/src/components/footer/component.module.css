@@ -51,15 +51,9 @@
     }
 }
 
-.footer .github {
+.footer .white {
     &:hover {
-        filter: drop-shadow(0 8px 20px var(--muted-foreground));
-    }
-}
-
-.footer .javascipt {
-    &:hover {
-        filter: drop-shadow(0 8px 20px #f7df1e);
+        filter: drop-shadow(0 8px 20px var(--text-h));
     }
 }
 

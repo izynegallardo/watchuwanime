@@ -2,14 +2,14 @@
     flex: 1;
     justify-content: center;
     width: 100%;
-    max-width: 42rem; /* max-w-2xl */
+    max-width: 42em; /* max-w-2xl */
     margin: 0 auto;
 
-    padding: 3rem 2rem;
+    padding: 2em;
 
     display: flex;
     flex-direction: column;
-    gap: 2.5rem; /* gap-10 */
+    gap: 2em; /* gap-10 */
 
     text-align: left;
 }
@@ -185,7 +185,7 @@
 
 .question .genreFieldset {
     border: 1px solid var(--border);
-    max-height: 240px;
+    max-height: 174px;
     overflow: auto;
 }
 

@@ -127,7 +127,7 @@ export default function Events() {
                 </div>
 
                 <div class='${styles.content}'>
-                    <div class='${styles.animeCardWrapper} ${animateClass} ${directionClass}'>
+                    <div class='${styles.animeCardWrapper} ${animateClass} ${directionClass}' style='max-height:${showTrailer() ? '100%' : '734px'}'>
                         ${AnimeCard(anime, currentIndex, total, showTrailer(), activeTab(), relationsState)}
                     </div>
 

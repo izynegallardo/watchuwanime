@@ -145,7 +145,7 @@ export default function AnimeCard(
                             </div>
 
                             <div class='${styles.animeCardTags}'>
-                                <span class='${styles.animeCardTag}'>${anime.durationMinutes} MIN</span>
+                                <span class='${styles.animeCardTag}'>${anime.durationMinutes || ''} MIN</span>
                                 <span class='${styles.animeCardTag}'>${isEps} EPS</span>
                                 <span class='${styles.animeCardTag}'>${anime.status}</span>
                             </div>

@@ -56,7 +56,7 @@ export default function Events() {
                                         </td>
 
                                         <td class='${styles.metaCell}'>
-                                            ${anime.totalMinutes} mins
+                                            ${anime.totalMinutes + 'mins' || 'Unknown'} 
                                         </td>
 
                                         <td class='${styles.metaCell}'>

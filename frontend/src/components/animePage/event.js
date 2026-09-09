@@ -88,7 +88,7 @@ export default function Events(params) {
 
             document.getElementById('main').innerHTML = `
                 <div class='${styles.content}'>
-                    <div class='${styles.animeCardWrapper}'>
+                    <div class='${styles.animeCardWrapper}' style='max-height:${showTrailer() ? '100%' : '734px'}'>
                         ${AnimeCard(anime, 0, 1, showTrailer(), activeTab(), relationsState)}
                     </div>
                 </div>

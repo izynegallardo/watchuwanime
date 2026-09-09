@@ -11,7 +11,7 @@ export const useState = (initialValue) => {
             return
         }
 
-        console.log('State changed:', value, '→', nextValue)
+        // console.log('State changed:', value, '→', nextValue)
         value = nextValue
 
         subscribers.forEach((fn) => fn(value))
