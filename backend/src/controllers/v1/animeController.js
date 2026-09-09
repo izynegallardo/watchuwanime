@@ -168,7 +168,7 @@ class AnimeController {
             const summaries = await generatePersonalizedSummaries(queryText, matches, timeAvailable)
 
             const recommendations = matches.map((match) =>
-                mapAnimeDetail(match, { summary: summaries.get(match.id) ?? '' }),
+                mapAnimeDetail(match, { summary: summaries.get(String(match.id)) ?? '' }),
             )
 
             response.status(200).json({
