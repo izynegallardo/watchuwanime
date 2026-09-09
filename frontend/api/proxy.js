@@ -48,7 +48,7 @@ export default async function handler(request, response) {
                 apikey: process.env.BACKEND_API_KEY,
             },
             body: request.method === 'GET' ? undefined : JSON.stringify(request.body),
-            signal: AbortSignal.timeout(15000),
+            signal: AbortSignal.timeout(45000),
         })
 
         const data = await backendResponse.json()
