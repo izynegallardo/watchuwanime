@@ -1,6 +1,5 @@
 import styles from './component.module.css'
 import githubLogo from '@/assets/github.svg'
-import viteLogo from '@/assets/vite.svg'
 import vercelLogo from '@/assets/vercel.svg'
 import renderLogo from '@/assets/render.svg'
 
@@ -15,11 +14,6 @@ export default function Footer(root) {
                     <li>
                         <a href='https://github.com/izynegallardo/watchuwanime' target='_blank'>
                             <img class='${styles.linkIcon} ${styles.white}' src="${githubLogo}" alt='Github logo'/></img>
-                        </a>
-                    </li>
-                    <li>
-                        <a href='https://vite.dev/' target='_blank'>
-                            <img class='${styles.linkIcon} ${styles.vite}' src="${viteLogo}" alt='Vite logo'/>
                         </a>
                     </li>
                     <li>

@@ -119,16 +119,16 @@
 .actions {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-top: 2rem;
-    padding-top: 2rem;
+    gap: 1em;
+    margin-top: 1em;
+    padding-top: 1em;
     border-top: 1px solid var(--border);
 }
 
 .tryAgainLink,
 .moreButton {
     flex: 1;
-    padding: 1rem;
+    padding: 1em;
     font-size: 0.875rem;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -164,7 +164,7 @@
 }
 
 .hint {
-    margin-top: 1.5rem;
+    margin-top: 1.5em;
     color: var(--primary);
     font-family: var(--mono);
     font-size: 0.75rem;

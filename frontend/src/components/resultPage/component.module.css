@@ -143,11 +143,14 @@
 }
 
 .result .nextButton {
-    color: var(--foreground);
+    color: #fff;
+    border-radius: 0;
+    background-color: var(--primary);
+    padding: 0.125rem 0.5rem;
 }
 
 .result .navButton:hover:not(:disabled) {
-    color: var(--primary);
+    background-color: var(--accent-border);
 }
 
 .result .navButton:disabled {

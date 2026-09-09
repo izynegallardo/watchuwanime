@@ -137,7 +137,7 @@ export default function Events() {
                             ${total <= 1 ? 'disabled' : ''}
                             data-action='prev'
                         >
-                            ← PREV
+                            PREV
                         </button>
 
                         <div class='${styles.recommendations}'>
@@ -159,7 +159,7 @@ export default function Events() {
                             ${total <= 1 ? 'disabled' : ''}
                             data-action='next'
                         >
-                            NEXT →
+                            NEXT
                         </button>
                     </div>
 
