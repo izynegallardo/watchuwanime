@@ -2,8 +2,10 @@ import '@/styles/common.css'
 import SPA from '@/core/spa'
 import { requireRecommendations } from '@/core/routeGuard'
 import { inject } from '@vercel/analytics'
+import { injectSpeedInsights } from '@vercel/speed-insights'
 
 inject()
+injectSpeedInsights()
 
 import NotFoundPage from '@/pages/notFoundPage'
 import HomePage from '@/pages/homePage'
