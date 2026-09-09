@@ -1,3 +1,5 @@
+set search_path to "$user", public, extensions;
+
 drop function if exists match_anime(extensions.vector(384), float, int, bigint[], text[]);
 
 create or replace function match_anime (

@@ -1,4 +1,9 @@
-import { pipeline } from '@huggingface/transformers'
+import { pipeline, env } from '@huggingface/transformers'
+
+// Default cacheDir lives inside node_modules/@huggingface/transformers/.cache,
+// which the non-root `app` user (see Dockerfile) doesn't own. Redirect it to
+// a dedicated directory that Dockerfile grants app write access to instead.
+env.cacheDir = process.env.TRANSFORMERS_CACHE_DIR || './.cache/transformers/'
 
 let extractor
 

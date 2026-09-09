@@ -13,7 +13,9 @@ async function migrate() {
     const isLocal = process.env.DOTENV_PATH === '.env.local'
 
     if (isLocal) {
-        files = files.filter((file) => file !== '003_create_anime_policies.sql')
+        files = files.filter((file) => file !== '004_create_anime_policies.sql')
+    } else {
+        files = files.filter((file) => file !== '001_create_extension.sql')
     }
 
     for (const file of files) {

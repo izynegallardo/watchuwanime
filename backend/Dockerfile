@@ -1,6 +1,6 @@
 FROM node:22-bookworm-slim
 
-WORKDIR /backend
+WORKDIR /app
 
 ENV NODE_ENV=production
 
@@ -19,6 +19,13 @@ COPY . .
 
 # Don't run the app as root inside the container.
 RUN groupadd -r app && useradd -r -g app app
+
+# The huggingface/transformers model cache (see src/services/embedding.js)
+# needs a directory the non-root user can write to - node_modules itself
+# stays root-owned from npm ci above, which is fine since nothing else
+# needs to write there.
+RUN mkdir -p .cache/transformers && chown -R app:app .cache
+
 USER app
 
 EXPOSE 3000

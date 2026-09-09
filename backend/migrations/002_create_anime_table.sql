@@ -30,10 +30,10 @@ create table anime (
   episodes integer,
   total_minutes integer generated always as (duration_minutes * coalesce(episodes, 1)) stored,
   content text not null,
-  embedding vector(384) -- all-MiniLM-L6-v2 outputs 384 dimensions
+  embedding extensions.vector(384) -- all-MiniLM-L6-v2 outputs 384 dimensions
 );
 
 SET maintenance_work_mem = '512MB';
 
-create index on anime using hnsw (embedding vector_cosine_ops);
+create index on anime using hnsw (embedding extensions.vector_cosine_ops);
 create index on anime using gin (genres);

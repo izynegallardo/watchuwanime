@@ -97,11 +97,11 @@ describe('anime schema + match_anime()', () => {
 
         const [table, matchFn] = await Promise.all([
             readFile(
-                new URL('../../../migrations/001_create_anime_table.sql', import.meta.url),
+                new URL('../../../migrations/002_create_anime_table.sql', import.meta.url),
                 'utf-8',
             ),
             readFile(
-                new URL('../../../migrations/002_create_match_anime_fn.sql', import.meta.url),
+                new URL('../../../migrations/003_create_match_anime_fn.sql', import.meta.url),
                 'utf-8',
             ),
         ])

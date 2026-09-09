@@ -9,6 +9,8 @@ export function responseError(response, error) {
         })
     }
 
+    console.error(error)
+
     return response.status(500).json({
         success: false,
         message: error.toString(),

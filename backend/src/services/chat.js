@@ -80,7 +80,7 @@ export async function generatePersonalizedSummaries(query, matches, timeAvailabl
 
             const parsed = JSON.parse(choice.message.content)
 
-            return new Map(parsed.summaries.map((s) => [s.id, s.summary]))
+            return new Map(parsed.summaries.map((s) => [String(s.id), s.summary]))
         } catch (error) {
             console.warn(`Model ${model} failed. Trying next fallback... Error:`, error.message)
         }

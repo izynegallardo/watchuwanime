@@ -8,7 +8,7 @@ const answerSchema = z.object({
 export const recommendSchema = z.object({
     answers: z.array(answerSchema).min(1),
     timeAvailable: z.number().int().positive(),
-    excludeIds: z.array(z.number().int()).optional().default([]),
+    excludeIds: z.array(z.coerce.number().int()).optional().default([]),
     // Off by default - frontend must explicitly opt in before Ecchi (or any
     // future mature genre added to MATURE_GENRES in animeController.js) is allowed.
     allowMatureGenres: z.boolean().optional().default(false),

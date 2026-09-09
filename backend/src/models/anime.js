@@ -141,13 +141,32 @@ class Anime {
     }
 
     /**
-     * Calls supabase.rpc - always remote, nothing currently calls this against
-     * a local target.
+     * Routes to whichever database is configured for the active env file -
+     * see isLocalTarget() above. Local path re-implements match_anime()'s
+     * logic (see migrations/003_create_match_anime_fn.sql) directly via pg,
+     * since that function only exists in Supabase and PostgREST/supabase-js
+     * aren't available against local Postgres.
      */
     async search(
         embedding,
         { matchThreshold = 0.3, matchCount = 10, excludeIds = [], excludeGenres = [] } = {},
     ) {
+        return this.isLocal
+            ? this.#searchLocal(embedding, {
+                  matchThreshold,
+                  matchCount,
+                  excludeIds,
+                  excludeGenres,
+              })
+            : this.#searchRemote(embedding, {
+                  matchThreshold,
+                  matchCount,
+                  excludeIds,
+                  excludeGenres,
+              })
+    }
+
+    async #searchRemote(embedding, { matchThreshold, matchCount, excludeIds, excludeGenres }) {
         try {
             const { supabase } = await import('../core/supabase.js')
             const results = await supabase.rpc('match_anime', {
@@ -168,7 +187,39 @@ class Anime {
                 embedding: parseEmbedding(row.embedding),
             }))
         } catch (error) {
-            console.error('<error> anime.search', error)
+            console.error('<error> anime.search (remote)', error)
+            throw error
+        }
+    }
+
+    async #searchLocal(embedding, { matchThreshold, matchCount, excludeIds, excludeGenres }) {
+        try {
+            const { pool } = await import('../core/database.js')
+            const result = await pool.query(
+                `
+                    select
+                        id, pahe_id, title, title_romaji, title_japanese, title_spanish, title_french,
+                        synonyms, type, aired_from, aired_to, year, season, genres, themes, demographics,
+                        studios, summary, status, is_airing, image_url, youtube_url, external_links,
+                        relations, recommendations, duration_minutes, episodes, total_minutes,
+                        embedding,
+                        1 - (embedding <=> $1) as similarity
+                    from anime
+                    where 1 - (embedding <=> $1) > $2
+                        and id <> all($3)
+                        and not (genres && $4)
+                    order by (embedding <=> $1) asc
+                    limit $5
+                `,
+                [toVectorLiteral(embedding), matchThreshold, excludeIds, excludeGenres, matchCount],
+            )
+
+            return result.rows.map((row) => ({
+                ...row,
+                embedding: parseEmbedding(row.embedding),
+            }))
+        } catch (error) {
+            console.error('<error> anime.search (local)', error)
             throw error
         }
     }
