@@ -3,7 +3,9 @@
     "buildCommand": "npm run build",
     "outputDirectory": "dist",
     "rewrites": [
-        { "source": "/api/:path*", "destination": "/api/:path*" },
-        { "source": "/(.*)", "destination": "/index.html" }
+        { "source": "/questions", "destination": "/index.html" },
+        { "source": "/results", "destination": "/index.html" },
+        { "source": "/summary", "destination": "/index.html" },
+        { "source": "/anime/:paheId", "destination": "/index.html" }
     ]
 }
