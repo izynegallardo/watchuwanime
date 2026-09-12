@@ -10,7 +10,7 @@ animeRouter.use(authorization)
 animeRouter.use(apiLimiter)
 
 animeRouter.post('/recommend', anime.recommend.bind(anime))
-animeRouter.get('/:id/relations', anime.relations.bind(anime))
+animeRouter.get('/:paheId/relations', anime.relations.bind(anime))
 animeRouter.get('/:paheId', anime.show.bind(anime))
 
 export default animeRouter

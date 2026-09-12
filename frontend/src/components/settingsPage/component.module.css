@@ -1,0 +1,140 @@
+.settings {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: 64rem;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 2em;
+}
+
+.settings .intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4em 0 2em;
+}
+
+.settings .introLabel {
+    margin-bottom: 0.5rem;
+    text-align: left;
+}
+
+.settings .label {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    color: var(--primary);
+}
+
+.settings .title {
+    margin: 0 0 1em;
+    font-family: var(--sans);
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.05em;
+    text-align: left;
+}
+
+.settings .description {
+    max-width: 28rem;
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.625;
+    color: var(--muted-foreground);
+    text-align: left;
+}
+
+.settings .form {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5em;
+    padding-bottom: 4rem;
+}
+
+.settings .container {
+    border-top: 1px solid var(--border);
+    padding-top: 2rem;
+}
+
+.settings .container:first-child {
+    border-top: 0;
+    padding-top: 0;
+}
+
+.settings .containerHeader {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1em;
+}
+
+.settings .containerTitle {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    text-align: left;
+}
+
+.settings .containerDescription {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--muted-foreground);
+    text-align: left;
+}
+
+.settings .toggleButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    max-width: 20rem;
+}
+
+.settings .toggleButton {
+    border: 1px solid var(--border);
+}
+
+.settings .toggleButton,
+.settings .clearButton {
+    padding: 0.25em 1em;
+    width: fit-content;
+    font-family: var(--mono);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.settings .toggleButton:hover {
+    opacity: 0.9;
+}
+
+.settings .toggleButton.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+.settings .toggleButton:not(.active) {
+    background: var(--muted);
+    color: var(--foreground);
+}
+
+.clearSave {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.clearButton {
+    border: 1px solid var(--primary);
+    background-color: transparent;
+    color: var(--primary);
+
+    &:hover {
+        background-color: var(--primary);
+        color: #fff;
+    }
+}

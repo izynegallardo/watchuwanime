@@ -144,6 +144,30 @@
     letter-spacing: 0.1em;
 }
 
+.animeCardSave {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    transition:
+        background-color 200ms ease,
+        border-color 200ms ease,
+        color 200ms ease;
+}
+
+.animeCardSave:hover {
+    border-color: var(--primary);
+}
+
+.animeCardSaveIcon {
+    width: 32px;
+    height: 32px;
+}
+
 .animeCardBadge {
     padding: 0.125rem 0.375rem;
     background: var(--primary);
@@ -204,11 +228,16 @@
 }
 
 .animeCardTitleRow {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: baseline;
     gap: 0.5rem;
     margin-bottom: 0.75rem;
+}
+
+.animeCardTitleRowTop {
+    display: flex;
 }
 
 .animeCardTitle {

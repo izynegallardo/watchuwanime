@@ -1,0 +1,311 @@
+.library {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: 64rem;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 2em;
+}
+
+.library .top {
+    display: flex;
+    align-items: center;
+    gap: 2em;
+    padding: 4em 0 2em;
+}
+
+.library .libraryContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.library .libraryIcon {
+    width: 20%;
+    height: 20%;
+}
+
+.library .intro {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+}
+
+.library .label {
+    margin-bottom: 0.5rem;
+    color: var(--primary);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+}
+
+.library .title {
+    margin: 0 0 0.5em;
+    font-family: var(--sans);
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.05em;
+}
+
+.library .description {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+}
+
+.library .status {
+    padding: 3em 1em;
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-align: center;
+}
+
+.library .empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    padding: 3em 1em;
+    text-align: center;
+}
+
+.library .emptyText {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+}
+
+.library .emptyLink {
+    padding: 0.75em 1.5em;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+}
+
+.library .emptyLink:hover {
+    background-color: var(--primary);
+    color: #fff;
+    text-decoration: none;
+}
+
+/* ── List ─────────────────────────────────────────────────────────────── */
+
+.library .listContainer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--border);
+    padding-bottom: 4em;
+    margin-bottom: 1em;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
+.library .listHeader,
+.library .list {
+    min-width: 48rem;
+}
+
+.library .listHeader {
+    flex-shrink: 0;
+}
+
+.library .list {
+    flex-shrink: 0;
+}
+
+.library .listHeader {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    padding: 0.75em 0.75em;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+}
+
+.library .list {
+    display: flex;
+    flex-direction: column;
+}
+
+.library .row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    width: 100%;
+    min-width: 48rem;
+    box-sizing: border-box;
+    padding: 0.5em 0.75em;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background-color 150ms ease;
+}
+
+.library .row:hover {
+    background: var(--muted);
+}
+
+.rowLink {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+
+.library .colIndex {
+    flex-shrink: 0;
+    width: 1.5rem;
+    color: var(--primary);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    text-align: center;
+}
+
+.library .colTitleHeader {
+    flex: 1 1 40%;
+    min-width: 0;
+    /* Aligns with the thumbnail + titleGroup pair below, which together
+       take up the same visual column this header label sits above. */
+    margin-left: calc(2.5rem + 1em);
+}
+
+.library .thumb {
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 3.5rem;
+    object-fit: cover;
+    background: var(--muted);
+}
+
+.library .titleGroup {
+    display: flex;
+    flex: 1 1 40%;
+    flex-direction: column;
+    min-width: 0;
+    gap: 0.125rem;
+}
+
+.library .rowTitle {
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.library .rowSubtitle {
+    overflow: hidden;
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.library .colGenre {
+    display: flex;
+    flex: 1 1 25%;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.library .genre {
+    padding: 0.125rem 0.375rem;
+    border: 1px solid var(--border);
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.library .colDate {
+    flex-shrink: 0;
+    width: 6rem;
+    color: var(--muted-foreground);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+}
+
+.library .colAction {
+    flex-shrink: 0;
+    width: 1.5rem;
+}
+
+.library .removeButton {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 150ms ease;
+}
+
+.library .removeButton:hover {
+    opacity: 1;
+}
+
+.library .trashIcon {
+    width: 0.875rem;
+    height: 0.875rem;
+}
+
+@media (max-width: 640px) {
+    .library .top {
+        flex-direction: column;
+        gap: 0;
+        padding: 2em;
+    }
+
+    .library .intro {
+        padding: 1em 0;
+        text-align: center;
+    }
+
+    .library .libraryIcon {
+        width: 30%;
+        height: 30%;
+    }
+
+    .library .title {
+        font-size: 2.5rem;
+    }
+
+    /* .library .colGenre,
+    .library .colTitleHeader {
+        display: none;
+    } */
+
+    .library .colDate {
+        width: 4rem;
+        font-size: 0.6875rem;
+    }
+}

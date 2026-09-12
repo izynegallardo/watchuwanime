@@ -2,14 +2,12 @@ import { expect, jest } from '@jest/globals'
 
 const mockSearch = jest.fn()
 const mockFindByPaheIds = jest.fn()
-const mockFindById = jest.fn()
 
 jest.unstable_mockModule('../../../models/anime.js', () => ({
     default: jest.fn().mockImplementation(() => ({
         create: jest.fn(),
         search: mockSearch,
         findByPaheIds: mockFindByPaheIds,
-        findById: mockFindById,
     })),
 }))
 
@@ -82,7 +80,6 @@ function buildMatches(count, { startId = 1, ...overrides } = {}) {
 beforeEach(() => {
     mockSearch.mockReset()
     mockFindByPaheIds.mockReset()
-    mockFindById.mockReset()
     mockGenerateEmbedding.mockReset()
     mockGeneratePersonalizedSummaries.mockReset()
 })
@@ -276,42 +273,46 @@ describe('POST /api/v1/anime/recommend', () => {
     })
 })
 
-describe('GET /api/v1/anime/:id/relations', () => {
+describe('GET /api/v1/anime/:paheId/relations', () => {
     it('groups hydrated relations by relation_type in display order', async () => {
-        mockFindById.mockResolvedValue({
-            id: 1,
-            relations: [
-                { pahe_id: 'pahe-side', title: 'Side Story Anime', relation_type: 'Side Story' },
-                { pahe_id: 'pahe-sequel', title: 'Sequel Anime', relation_type: 'Sequel' },
-            ],
-        })
-        mockFindByPaheIds.mockResolvedValue([
-            {
-                id: 20,
-                pahe_id: 'pahe-side',
-                title: 'Side Story Anime',
-                title_romaji: null,
-                type: 'OVA',
-                episodes: 2,
-                status: 'Finished Airing',
-                season: 'Winter 2015',
-                image_url: 'https://example.com/side.jpg',
-            },
-            {
-                id: 21,
-                pahe_id: 'pahe-sequel',
-                title: 'Sequel Anime',
-                title_romaji: null,
-                type: 'TV',
-                episodes: 12,
-                status: 'Finished Airing',
-                season: 'Spring 2017',
-                image_url: 'https://example.com/sequel.jpg',
-            },
-        ])
+        mockFindByPaheIds
+            .mockResolvedValueOnce([
+                {
+                    id: 1,
+                    pahe_id: 'pahe-1',
+                    relations: [
+                        { pahe_id: 'pahe-side', title: 'Side Story Anime', relation_type: 'Side Story' },
+                        { pahe_id: 'pahe-sequel', title: 'Sequel Anime', relation_type: 'Sequel' },
+                    ],
+                },
+            ])
+            .mockResolvedValueOnce([
+                {
+                    id: 20,
+                    pahe_id: 'pahe-side',
+                    title: 'Side Story Anime',
+                    title_romaji: null,
+                    type: 'OVA',
+                    episodes: 2,
+                    status: 'Finished Airing',
+                    season: 'Winter 2015',
+                    image_url: 'https://example.com/side.jpg',
+                },
+                {
+                    id: 21,
+                    pahe_id: 'pahe-sequel',
+                    title: 'Sequel Anime',
+                    title_romaji: null,
+                    type: 'TV',
+                    episodes: 12,
+                    status: 'Finished Airing',
+                    season: 'Spring 2017',
+                    image_url: 'https://example.com/sequel.jpg',
+                },
+            ])
 
         const response = await request(app)
-            .get('/api/v1/anime/1/relations')
+            .get('/api/v1/anime/pahe-1/relations')
             .set('apikey', apikey)
 
         expect(response.statusCode).toBe(200)
@@ -327,66 +328,63 @@ describe('GET /api/v1/anime/:id/relations', () => {
         ])
     })
 
-    it('returns an empty array without querying findByPaheIds when the anime has no relations', async () => {
-        mockFindById.mockResolvedValue({ id: 1, relations: [] })
+    it('returns an empty array without a second findByPaheIds call when the anime has no relations', async () => {
+        mockFindByPaheIds.mockResolvedValueOnce([{ id: 1, pahe_id: 'pahe-1', relations: [] }])
 
         const response = await request(app)
-            .get('/api/v1/anime/1/relations')
+            .get('/api/v1/anime/pahe-1/relations')
             .set('apikey', apikey)
 
         expect(response.statusCode).toBe(200)
         expect(response.body.relations).toEqual([])
-        expect(mockFindByPaheIds).not.toHaveBeenCalled()
+        expect(mockFindByPaheIds).toHaveBeenCalledTimes(1)
     })
 
-    it('returns 404 when the anime id does not exist, without calling findByPaheIds', async () => {
-        mockFindById.mockResolvedValue(null)
+    it('returns 404 when the pahe_id does not exist, without a hydration call', async () => {
+        mockFindByPaheIds.mockResolvedValueOnce([])
 
         const response = await request(app)
-            .get('/api/v1/anime/999/relations')
+            .get('/api/v1/anime/does-not-exist/relations')
             .set('apikey', apikey)
 
         expect(response.statusCode).toBe(404)
-        expect(mockFindByPaheIds).not.toHaveBeenCalled()
-    })
-
-    it('rejects a non-numeric id without touching the model', async () => {
-        const response = await request(app)
-            .get('/api/v1/anime/not-a-number/relations')
-            .set('apikey', apikey)
-
-        expect(response.statusCode).toBe(400)
-        expect(mockFindById).not.toHaveBeenCalled()
+        expect(mockFindByPaheIds).toHaveBeenCalledTimes(1)
     })
 
     it('rejects requests without a valid apikey', async () => {
-        const response = await request(app).get('/api/v1/anime/1/relations')
+        const response = await request(app).get('/api/v1/anime/pahe-1/relations')
 
         expect(response.statusCode).toBe(401)
-        expect(mockFindById).not.toHaveBeenCalled()
+        expect(mockFindByPaheIds).not.toHaveBeenCalled()
     })
 
     it('keeps an unrecognized relation_type as its own group, sorted to the end', async () => {
-        mockFindById.mockResolvedValue({
-            id: 1,
-            relations: [{ pahe_id: 'pahe-x', title: 'Something Else', relation_type: 'Made Up Type' }],
-        })
-        mockFindByPaheIds.mockResolvedValue([
-            {
-                id: 30,
-                pahe_id: 'pahe-x',
-                title: 'Something Else',
-                title_romaji: null,
-                type: 'TV',
-                episodes: 1,
-                status: 'Finished Airing',
-                season: null,
-                image_url: 'https://example.com/x.jpg',
-            },
-        ])
+        mockFindByPaheIds
+            .mockResolvedValueOnce([
+                {
+                    id: 1,
+                    pahe_id: 'pahe-1',
+                    relations: [
+                        { pahe_id: 'pahe-x', title: 'Something Else', relation_type: 'Made Up Type' },
+                    ],
+                },
+            ])
+            .mockResolvedValueOnce([
+                {
+                    id: 30,
+                    pahe_id: 'pahe-x',
+                    title: 'Something Else',
+                    title_romaji: null,
+                    type: 'TV',
+                    episodes: 1,
+                    status: 'Finished Airing',
+                    season: null,
+                    image_url: 'https://example.com/x.jpg',
+                },
+            ])
 
         const response = await request(app)
-            .get('/api/v1/anime/1/relations')
+            .get('/api/v1/anime/pahe-1/relations')
             .set('apikey', apikey)
 
         expect(response.body.relations).toEqual([

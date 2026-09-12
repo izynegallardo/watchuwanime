@@ -116,6 +116,41 @@
     font-size: 0.75rem;
 }
 
+.saveCell {
+    width: 2.5rem;
+    padding: 0.75rem 1rem;
+    text-align: center;
+}
+
+.saveButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    border: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    transition:
+        background-color 200ms ease,
+        border-color 200ms ease;
+}
+
+.saveButton:hover {
+    border-color: var(--primary);
+}
+
+.saveButton[aria-pressed='true'] {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.saveIcon {
+    width: 0.875em;
+    height: 0.875em;
+}
+
 .actions {
     display: flex;
     flex-direction: column;

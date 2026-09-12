@@ -1,6 +1,9 @@
 import styles from './component.module.css'
-import { normalizeHTML, normalizeDate } from '@/utils/normalize'
 import AnimeRelations from '../relations/main'
+import { normalizeHTML, normalizeDate } from '@/utils/normalize'
+import { isSaved } from '@/utils/saved'
+import BookMarkIcon from '@/assets/bookmark.svg'
+import UnBookMarkIcon from '@/assets/unbookmark.svg'
 
 // Pulls the 11-char video id out of any common YouTube URL shape so we can
 // build an /embed/ URL for the iframe - the raw watch URL can't be embedded directly.
@@ -9,6 +12,28 @@ function toYoutubeEmbedUrl(url) {
 
     const match = url.match(/(?:v=|youtu\.be\/)([\w-]{11})/)
     return match ? `https://www.youtube.com/embed/${match[1]}?autoplay=1` : null
+}
+
+/**
+ * Patches every save button currently in the DOM to match localStorage,
+ * without a full render() - keeps a playing trailer iframe alive (see the
+ * toggle-save handlers in resultPage/event.js and animePage/event.js for
+ * why that matters). Meant to be called from a subscribeSavedIds()
+ * callback, not directly from the click handler itself.
+ *
+ * Uses querySelectorAll (not a single querySelector) so this stays correct
+ * even if a future layout ever renders more than one card at once.
+ */
+export function syncSaveButtons() {
+    document.querySelectorAll('[data-action="toggle-save"]').forEach((button) => {
+        const saved = isSaved(button.dataset.paheId)
+
+        button.setAttribute('aria-pressed', String(saved))
+        button.setAttribute('aria-label', saved ? 'Remove from saved' : 'Save anime')
+
+        const icon = button.querySelector('img')
+        if (icon) icon.src = saved ? BookMarkIcon : UnBookMarkIcon
+    })
 }
 
 export default function AnimeCard(
@@ -32,6 +57,7 @@ export default function AnimeCard(
         : normalizeHTML(anime.title)
     const isJapanese = anime.titleJapanese ? normalizeHTML(anime.titleJapanese) : ''
     const isEps = anime.episodes ? anime.episodes : '1'
+    const saved = isSaved(anime.paheId)
 
     return `
         <div class='${styles.animeCard}'>
@@ -88,7 +114,6 @@ export default function AnimeCard(
                                 `
                                         : '<span></span>'
                                 }
-
                                 <span class='${styles.animeCardBadge}'>
                                     ${anime.type.toUpperCase()}
                                 </span>
@@ -111,11 +136,26 @@ export default function AnimeCard(
                         </div>
 
                         <div class='${styles.animeCardInfo}'>
-                            <div class='${styles.animeCardTitleRow}'>
-                                <h2 class='${styles.animeCardTitle}'>${normalizeHTML(anime.title)}</h2>
-                                <h3 class='${styles.animeCardSubTitle}'>${isSubTitle}</h3>
-                                <h4 class='${styles.animeCardSubTitle}'>${isJapanese}</h4>
-                                <span class='${styles.animeCardYear}'>Aired: ${isAiredFrom} ${isBoth} ${isAiredTo}</span>
+                            <div class='${styles.animeCardTitleRowTop}'>
+                                <div class='${styles.animeCardTitleRow}'>
+                                    <h2 class='${styles.animeCardTitle}'>${normalizeHTML(anime.title)}</h2>
+                                    <h3 class='${styles.animeCardSubTitle}'>${isSubTitle}</h3>
+                                    <h4 class='${styles.animeCardSubTitle}'>${isJapanese}</h4>
+                                    <span class='${styles.animeCardYear}'>Aired: ${isAiredFrom} ${isBoth} ${isAiredTo}</span>
+                                </div>
+
+                                <div>
+                                    <button
+                                        type='button'
+                                        class='${styles.animeCardSave}'
+                                        data-action='toggle-save'
+                                        data-pahe-id='${anime.paheId}'
+                                        aria-label='${saved ? 'Remove from saved' : 'Save anime'}'
+                                        aria-pressed='${saved}'
+                                    >
+                                        <img class='${styles.animeCardSaveIcon}' src="${saved ? BookMarkIcon : UnBookMarkIcon}">
+                                    </button>
+                                </div>
                             </div>
 
                             <div class='${styles.animeCardTags}'>

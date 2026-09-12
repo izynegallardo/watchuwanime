@@ -1,7 +1,6 @@
 import Anime from '../../models/anime.js'
 import {
     recommendSchema,
-    animeIdParamSchema,
     animePaheIdParamSchema,
 } from '../../schemas/animeSchema.js'
 import { generateEmbedding } from '../../services/embedding.js'
@@ -227,9 +226,9 @@ class AnimeController {
      */
     async relations(request, response) {
         try {
-            const { id } = animeIdParamSchema.parse(request.params)
+            const { paheId } = animePaheIdParamSchema.parse(request.params)
 
-            const source = await this.anime.findById(id)
+            const [source] = await this.anime.findByPaheIds([paheId])
             if (!source) {
                 return response.status(404).json({ success: false, message: 'Anime not found' })
             }

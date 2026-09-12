@@ -6,11 +6,12 @@ export default function Main(root) {
             <span id='user-counter' class='${styles.userCounter}'></span>
 
             <h2 class='${styles.questionTitle}'>
-                WHAT IS YOUR FAVORITE ANIME AND WHY?
+                WHAT KIND OF ANIME ARE YOU LOOKING FOR RIGHT NOW?
             </h2>
 
             <p class='${styles.questionDescription}'>
-                Be specific. The more detail you share, the better your recommendations.
+                Describe the mood, experience, or type of story you’re craving. 
+                The more you tell us, the better we can match your vibe.
             </p>
         </div>
 

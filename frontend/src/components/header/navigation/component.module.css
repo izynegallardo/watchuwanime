@@ -4,18 +4,29 @@
     align-items: center;
     padding: 1em 2em;
     width: 100%;
+}
 
-    ul {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-    }
+.navigation ul {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
 
-    a {
-        font-family: var(--mono);
-        font-size: 0.75rem;
-        letter-spacing: 0.1em;
-        color: var(--muted-foreground);
-    }
+.navigation li {
+    display: flex;
+    gap: 1em;
+}
+
+.navigation a {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--muted-foreground);
+}
+
+.navigation .settingsIcon,
+.navigation .bookMarkIcon {
+    width: 30px;
+    height: 30px;
 }

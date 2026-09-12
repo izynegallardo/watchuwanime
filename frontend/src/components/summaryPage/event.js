@@ -12,6 +12,11 @@ import {
 import { TIME_STEPS } from '@/data/time'
 import { fetchRecommendations } from '@/api/anime'
 import { setIndex as setCarouselIndex } from '@/components/resultPage/event'
+import { syncSaveButtons } from '@/components/resultPage/card/main'
+import { isSaved, toggleSaved } from '@/utils/saved'
+import { subscribeSavedIds, syncSavedIds } from '@/store/saved'
+import BookMarkIcon from '@/assets/bookmark.svg'
+import UnBookMarkIcon from '@/assets/unbookmark.svg'
 import LoadingScreen from '@/components/loadingScreen/main'
 import Main from './main'
 
@@ -34,6 +39,7 @@ export default function Events() {
                             <th class='${styles.tableHeader}'>SEASON</th>
                             <th class='${styles.tableHeader}'>TYPE</th>
                             <th class='${styles.tableHeader}'>GENRES</th>
+                            <th class='${styles.tableHeader}'></th>
                         </tr>
                     </thead>
 
@@ -56,7 +62,7 @@ export default function Events() {
                                         </td>
 
                                         <td class='${styles.metaCell}'>
-                                            ${anime.totalMinutes + 'mins' || 'Unknown'} 
+                                            ${anime.totalMinutes + ' mins' || 'Unknown'} 
                                         </td>
 
                                         <td class='${styles.metaCell}'>
@@ -80,6 +86,23 @@ export default function Events() {
                                                     .join('')}
                                             </div>
                                         </td>
+
+                                        <td class='${styles.saveCell}'>
+                                            <button
+                                                type='button'
+                                                class='${styles.saveButton}'
+                                                data-action='toggle-save'
+                                                data-pahe-id='${anime.paheId}'
+                                                aria-label='${isSaved(anime.paheId) ? 'Remove from saved' : 'Save anime'}'
+                                                aria-pressed='${isSaved(anime.paheId)}'
+                                            >
+                                                <img
+                                                    class='${styles.saveIcon}'
+                                                    src='${isSaved(anime.paheId) ? BookMarkIcon : UnBookMarkIcon}'
+                                                    alt=''
+                                                />
+                                            </button>
+                                        </td>
                                     </tr>
                                 `
                             })
@@ -92,6 +115,19 @@ export default function Events() {
                 row.addEventListener('click', () => {
                     setCarouselIndex(Number(row.dataset.index))
                     window.app.pushRoute('/results')
+                })
+            })
+
+            // Stops the row's own click (which navigates) from also firing -
+            // toggleSaved()+syncSavedIds() matches the pattern in resultPage/
+            // animePage: write to localStorage, notify the store, and let
+            // subscribeSavedIds(syncSaveButtons) below patch this button's
+            // icon/aria state rather than doing it inline here.
+            document.querySelectorAll('[data-action="toggle-save"]').forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    event.stopPropagation()
+                    toggleSaved(button.dataset.paheId)
+                    syncSavedIds()
                 })
             })
         }
@@ -161,6 +197,12 @@ export default function Events() {
 
         renderTable()
         renderActions()
+
+        const unsubscribeSavedIds = subscribeSavedIds(syncSaveButtons)
+
+        return () => {
+            unsubscribeSavedIds()
+        }
     } catch (error) {
         console.error('Summary Page event:', error)
     }

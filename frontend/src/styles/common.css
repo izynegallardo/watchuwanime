@@ -77,7 +77,7 @@ body,
 #app {
     margin: 0;
     width: 100%;
-    min-width: 280px;
+    min-width: 375px;
     min-height: 100%;
     font-family: var(--sans);
     line-height: 1.5;

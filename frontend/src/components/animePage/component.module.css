@@ -14,7 +14,7 @@
 .anime .animeCardWrapper {
     display: flex;
     border: 1px solid var(--border);
-    min-height: 720px;
+    min-height: 718px;
     max-height: 100%;
 }
 

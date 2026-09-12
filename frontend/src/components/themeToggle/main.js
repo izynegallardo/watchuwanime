@@ -5,23 +5,28 @@ export default function ThemeToggle(root) {
     const render = () => {
         root.className = styles.themeToggle
 
-        root.innerHTML = `
-            <button id="toggleThemeBtn" class="${styles.themeButton}" type="button" aria-label="Toggle theme">
-                <span class="${styles.darkLabel}">
-                    DARK
-                </span>
+        if (!root.querySelector('#toggleThemeBtn')) {
+            root.insertAdjacentHTML(
+                'beforeend',
+                `
+                    <button id="toggleThemeBtn" class="${styles.themeButton}" type="button" aria-label="Toggle theme">
+                        <span class="${styles.darkLabel}">
+                            DARK
+                        </span>
 
-                <span class="${styles.textBorder}">|</span>
+                        <span class="${styles.textBorder}">|</span>
 
-                <span class="${styles.lightLabel}">
-                    LIGHT
-                </span>
+                        <span class="${styles.lightLabel}">
+                            LIGHT
+                        </span>
 
-                <span class="${styles.switch}">
-                    <span class="${styles.switchThumb}"></span>
-                </span>
-            </button>
-        `
+                        <span class="${styles.switch}">
+                            <span class="${styles.switchThumb}"></span>
+                        </span>
+                    </button>
+                `,
+            )
+        }
 
         updateState()
 

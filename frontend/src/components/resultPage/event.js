@@ -1,8 +1,10 @@
 import styles from './component.module.css'
-import AnimeCard from './card/main'
+import AnimeCard, { syncSaveButtons } from './card/main'
 import { useState } from '@/core/useState'
 import { recommendations, subscribeRecommendations } from '@/store/counter'
+import { subscribeSavedIds, syncSavedIds } from '@/store/saved'
 import { fetchAnimeRelations } from '@/api/anime'
+import { toggleSaved } from '@/utils/saved'
 
 const [index, setIndex, subscribeIndex] = useState(0)
 
@@ -17,7 +19,8 @@ const [showTrailer, setShowTrailer, subscribeShowTrailer] = useState(false)
 
 // Same idea for the Summary/Relations tab - resets to 'summary' on every
 // navigation. relationsCache is a plain Map (not store state) keyed by
-// anime id, so flipping back to a card whose relations you already opened
+// anime pahe_id (not the internal id - keeping ids out of the URL/cache
+// avoids making them enumerable), so flipping back to a card whose relations you already opened
 // doesn't refetch - it's just a memoization layer, nothing subscribes to it
 // directly, render() is called manually after each fetch settles.
 const [activeTab, setActiveTab, subscribeActiveTab] = useState('summary')
@@ -66,18 +69,18 @@ export default function Events() {
             setIndex(targetIndex)
         }
 
-        async function loadRelations(animeId) {
-            if (relationsCache.has(animeId)) return
+        async function loadRelations(paheId) {
+            if (relationsCache.has(paheId)) return
 
-            relationsCache.set(animeId, { status: 'loading', groups: [] })
+            relationsCache.set(paheId, { status: 'loading', groups: [] })
             render()
 
             try {
-                const groups = await fetchAnimeRelations(animeId)
-                relationsCache.set(animeId, { status: 'loaded', groups })
+                const groups = await fetchAnimeRelations(paheId)
+                relationsCache.set(paheId, { status: 'loaded', groups })
             } catch (error) {
                 console.log('Failed to load relations:', error)
-                relationsCache.set(animeId, { status: 'error', groups: [] })
+                relationsCache.set(paheId, { status: 'error', groups: [] })
             }
 
             render()
@@ -110,7 +113,10 @@ export default function Events() {
             const animateClass = animateNextRender ? styles.animate : ''
             animateNextRender = false
             const directionClass = lastDirection === -1 ? styles.slideInLeft : ''
-            const relationsState = relationsCache.get(anime.id) ?? { status: 'idle', groups: [] }
+            const relationsState = relationsCache.get(anime.paheId) ?? {
+                status: 'idle',
+                groups: [],
+            }
 
             document.querySelector('#result-content').innerHTML = `
                 <div class='${styles.header}'>
@@ -133,7 +139,7 @@ export default function Events() {
 
                     <div class='${styles.navigation}'>
                         <button
-                            class='${styles.navButton} ${styles.prevButton}'
+                            class='${styles.navButton}'
                             ${total <= 1 ? 'disabled' : ''}
                             data-action='prev'
                         >
@@ -155,7 +161,7 @@ export default function Events() {
                         </div>
 
                         <button
-                            class='${styles.navButton} ${styles.nextButton}'
+                            class='${styles.navButton}'
                             ${total <= 1 ? 'disabled' : ''}
                             data-action='next'
                         >
@@ -181,6 +187,18 @@ export default function Events() {
                 .querySelector('[data-action="toggle-trailer"]')
                 ?.addEventListener('click', () => setShowTrailer((prev) => !prev))
 
+            // Toggles localStorage directly and deliberately does NOT call
+            // render() here - a full innerHTML replace would tear down and
+            // restart the trailer iframe if one happens to be playing (see
+            // toYoutubeEmbedUrl comment above). syncSavedIds() pushes the
+            // change into the shared store, which every mounted save button
+            // (this one included) picks up via subscribeSavedIds(syncSaveButtons)
+            // below - so no direct DOM patching happens in this handler itself.
+            document.querySelector('[data-action="toggle-save"]')?.addEventListener('click', (event) => {
+                toggleSaved(event.currentTarget.dataset.paheId)
+                syncSavedIds()
+            })
+
             document.querySelectorAll('[data-index]').forEach((button) => {
                 button.addEventListener('click', () => goTo(Number(button.dataset.index)))
             })
@@ -189,7 +207,7 @@ export default function Events() {
                 button.addEventListener('click', () => {
                     const tab = button.dataset.tab
                     setActiveTab(tab)
-                    if (tab === 'relations') loadRelations(anime.id)
+                    if (tab === 'relations') loadRelations(anime.paheId)
                 })
             })
 
@@ -240,12 +258,16 @@ export default function Events() {
         const unsubscribeIndex = subscribeIndex(render)
         const unsubscribeShowTrailer = subscribeShowTrailer(render)
         const unsubscribeActiveTab = subscribeActiveTab(render)
+        // Patches just the save button's DOM in place - see the comment above
+        // the toggle-save click handler for why this can't be render().
+        const unsubscribeSavedIds = subscribeSavedIds(syncSaveButtons)
 
         return () => {
             unsubscribeRecommendations()
             unsubscribeIndex()
             unsubscribeShowTrailer()
             unsubscribeActiveTab()
+            unsubscribeSavedIds()
         }
     } catch (error) {
         console.log('Result Page Event:', error)

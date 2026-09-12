@@ -1,14 +1,17 @@
 import styles from './component.module.css'
-import AnimeCard from '@/components/resultPage/card/main'
+import AnimeCard, { syncSaveButtons } from '@/components/resultPage/card/main'
 import { useState } from '@/core/useState'
 import { fetchAnimeByPaheId, fetchAnimeRelations } from '@/api/anime'
+import { peek } from '@/core/cache'
+import { toggleSaved } from '@/utils/saved'
+import { subscribeSavedIds, syncSavedIds } from '@/store/saved'
 
-// Module-level (not inside Events()) so these survive across visits: leaving
-// an anime page and coming back to the SAME pahe_id reuses what's already
-// fetched instead of hitting the API again. Keyed by pahe_id (animeCache) and
-// by internal id (relationsCache, matching resultPage's convention) since
-// relations are only ever looked up once we already have the anime's id.
-const animeCache = new Map()
+// Module-level (not inside Events()) so this survives across visits: leaving
+// a relations tab open and coming back reuses what's already fetched. Keyed
+// by pahe_id (not the internal id - keeping ids out of the URL/cache avoids
+// making them enumerable), matching resultPage's convention. The anime data
+// itself no longer needs its own Map here - fetchAnimeByPaheId is cached
+// session-wide in core/cache.js, shared with resultPage and the Saved page.
 const relationsCache = new Map()
 
 export default function Events(params) {
@@ -22,14 +25,16 @@ export default function Events(params) {
         const [showTrailer, setShowTrailer, subscribeShowTrailer] = useState(false)
         const [activeTab, setActiveTab, subscribeActiveTab] = useState('summary')
 
-        let anime = paheId ? (animeCache.get(paheId) ?? null) : null
+        // peek() reads the shared session cache synchronously so a revisit
+        // to an already-fetched paheId renders instantly instead of
+        // flashing 'LOADING...' for one tick while query() resolves.
+        let anime = paheId ? (peek(`anime:${paheId}`) ?? null) : null
         // 'loading' | 'loaded' | 'not-found' | 'error'
         let status = anime ? 'loaded' : paheId ? 'loading' : 'not-found'
 
         async function load() {
             try {
                 anime = await fetchAnimeByPaheId(paheId)
-                animeCache.set(paheId, anime)
                 status = 'loaded'
             } catch (error) {
                 console.log('Failed to load anime:', error)
@@ -39,17 +44,17 @@ export default function Events(params) {
         }
 
         async function loadRelations() {
-            if (!anime || relationsCache.has(anime.id)) return
+            if (!anime || relationsCache.has(anime.paheId)) return
 
-            relationsCache.set(anime.id, { status: 'loading', groups: [] })
+            relationsCache.set(anime.paheId, { status: 'loading', groups: [] })
             render()
 
             try {
-                const groups = await fetchAnimeRelations(anime.id)
-                relationsCache.set(anime.id, { status: 'loaded', groups })
+                const groups = await fetchAnimeRelations(anime.paheId)
+                relationsCache.set(anime.paheId, { status: 'loaded', groups })
             } catch (error) {
                 console.log('Failed to load relations:', error)
-                relationsCache.set(anime.id, { status: 'error', groups: [] })
+                relationsCache.set(anime.paheId, { status: 'error', groups: [] })
             }
 
             render()
@@ -84,7 +89,10 @@ export default function Events(params) {
                 return
             }
 
-            const relationsState = relationsCache.get(anime.id) ?? { status: 'idle', groups: [] }
+            const relationsState = relationsCache.get(anime.paheId) ?? {
+                status: 'idle',
+                groups: [],
+            }
 
             document.getElementById('main').innerHTML = `
                 <div class='${styles.content}'>
@@ -97,6 +105,14 @@ export default function Events(params) {
             document
                 .querySelector('[data-action="toggle-trailer"]')
                 ?.addEventListener('click', () => setShowTrailer((prev) => !prev))
+
+            // See resultPage/event.js for why this pushes into the shared
+            // store (syncSavedIds) instead of patching this button's DOM
+            // directly - subscribeSavedIds(syncSaveButtons) below does that.
+            document.querySelector('[data-action="toggle-save"]')?.addEventListener('click', (event) => {
+                toggleSaved(event.currentTarget.dataset.paheId)
+                syncSavedIds()
+            })
 
             document.querySelectorAll('[data-tab]').forEach((button) => {
                 button.addEventListener('click', () => {
@@ -113,10 +129,12 @@ export default function Events(params) {
 
         const unsubscribeShowTrailer = subscribeShowTrailer(render)
         const unsubscribeActiveTab = subscribeActiveTab(render)
+        const unsubscribeSavedIds = subscribeSavedIds(syncSaveButtons)
 
         return () => {
             unsubscribeShowTrailer()
             unsubscribeActiveTab()
+            unsubscribeSavedIds()
         }
     } catch (error) {
         console.log('Anime Page Event:', error)

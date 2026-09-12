@@ -14,6 +14,7 @@ import {
     sessionAnswers,
     setSessionAnswers,
     setRecommendations,
+    shownIds,
     setShownIds,
 } from '@/store/counter'
 import { GENRES, THEMES } from '@/data/genres'
@@ -167,11 +168,16 @@ export default function Events() {
 
                 showLoadingScreen()
 
-                fetchRecommendations(allAnswers, TIME_STEPS[timeIndex()], [], allowMatureGenres())
+                fetchRecommendations(
+                    allAnswers,
+                    TIME_STEPS[timeIndex()],
+                    shownIds(),
+                    allowMatureGenres(),
+                )
                     .then((data) => {
                         setSessionAnswers(allAnswers)
                         setRecommendations(data)
-                        setShownIds(data.map((anime) => anime.id))
+                        setShownIds((prev) => [...prev, ...data.map((anime) => anime.id)])
 
                         window.app.pushRoute('/results')
                     })

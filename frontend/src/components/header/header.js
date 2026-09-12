@@ -6,7 +6,6 @@ export default function Header(root) {
         <div id='header-div'></div>
     `
 
-    root.className = styles['header']
-
+    root.className = styles.header
     Navigation(document.getElementById('header-div'))
 }

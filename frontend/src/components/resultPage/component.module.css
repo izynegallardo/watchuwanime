@@ -78,7 +78,7 @@
     flex: 1;
     display: flex;
     border: 1px solid var(--border);
-    min-height: 720px;
+    min-height: 718px;
     /* pan-y (not none): lets vertical scroll inside the card still work,
        while leaving horizontal gesture handling to our own touchstart/
        touchend listeners in event.js instead of the browser's scroll-chain. */
@@ -128,25 +128,16 @@
 
 .result .navButton {
     border: 0;
-    padding: 0;
-    background: none;
+    padding: 0.125rem 0.5rem;
+    color: #fff;
+    border-radius: 0;
+    background-color: var(--primary);
     font-family: var(--mono);
     font-size: 0.875rem;
     font-weight: 500;
     letter-spacing: 0.1em;
     cursor: pointer;
     transition: color 0.15s ease;
-}
-
-.result .prevButton {
-    color: var(--muted-foreground);
-}
-
-.result .nextButton {
-    color: #fff;
-    border-radius: 0;
-    background-color: var(--primary);
-    padding: 0.125rem 0.5rem;
 }
 
 .result .navButton:hover:not(:disabled) {
