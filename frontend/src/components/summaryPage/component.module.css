@@ -123,13 +123,14 @@
 }
 
 .saveButton {
+    position: relative;
+    z-index: 999;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 1.5rem;
-    height: 1.5rem;
+    width: auto;
     padding: 0;
-    border: 1px solid var(--border);
+    border: 0;
     background: transparent;
     cursor: pointer;
     transition:
@@ -141,14 +142,9 @@
     border-color: var(--primary);
 }
 
-.saveButton[aria-pressed='true'] {
-    background: var(--primary);
-    border-color: var(--primary);
-}
-
 .saveIcon {
-    width: 0.875em;
-    height: 0.875em;
+    width: 24px;
+    height: 24px;
 }
 
 .actions {

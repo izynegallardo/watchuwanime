@@ -94,6 +94,17 @@ export default function AnimeCard(
                 !trailerActive
                     ? `
                     <div class='${styles.animeCardTop}'>
+                        <button
+                            class='${styles.animeCardSaveMobile}'
+                            type='button'
+                            data-action='toggle-save'
+                            data-pahe-id='${anime.paheId}'
+                            aria-label='${saved ? 'Remove from saved' : 'Save anime'}'
+                            aria-pressed='${saved}'
+                            title='${saved ? 'Remove from library' : 'Add to library'}'
+                        >
+                            <img class='${styles.animeCardSaveIcon}' src="${saved ? BookMarkIcon : UnBookMarkIcon}">
+                        </button>
                         <div class='${styles.animeCardImage}' style="--bg-image: url('${normalizeHTML(anime.imageUrl)}')">
                             <img
                                 src='${normalizeHTML(anime.imageUrl)}'

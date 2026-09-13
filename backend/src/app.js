@@ -7,12 +7,13 @@ import v1 from './routes/v1/index.js'
 
 const app = express()
 
-app.set('trust proxy', 1)
-app.get('/healthz', (request, response) => response.status(200).send('ok'))
 app.use(morgan('dev'))
 app.use(cookieParser())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
+
+app.set('trust proxy', 1)
+app.get('/healthz', (request, response) => response.status(200).send('ok'))
 
 const allowedOrigins = process.env.FRONTEND_URLS.split(',').map((url) => url.trim())
 

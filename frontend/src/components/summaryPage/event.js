@@ -2,6 +2,7 @@ import styles from './component.module.css'
 import {
     timeIndex,
     allowMatureGenres,
+    allowedSideStoryTypes,
     recommendations,
     setRecommendations,
     shownIds,
@@ -18,16 +19,11 @@ import { subscribeSavedIds, syncSavedIds } from '@/store/saved'
 import BookMarkIcon from '@/assets/bookmark.svg'
 import UnBookMarkIcon from '@/assets/unbookmark.svg'
 import LoadingScreen from '@/components/loadingScreen/main'
+import LoadingScreenEvents from '@/components/loadingScreen/event'
 import Main from './main'
-
-const MAX_SHOWN = 30
 
 export default function Events() {
     try {
-        function canMore() {
-            return shownIds().length < MAX_SHOWN
-        }
-
         function renderTable() {
             document.querySelector('#table-container').innerHTML = `
                 <table class='${styles.table}'>
@@ -89,17 +85,18 @@ export default function Events() {
 
                                         <td class='${styles.saveCell}'>
                                             <button
-                                                type='button'
                                                 class='${styles.saveButton}'
+                                                type='button'
                                                 data-action='toggle-save'
                                                 data-pahe-id='${anime.paheId}'
                                                 aria-label='${isSaved(anime.paheId) ? 'Remove from saved' : 'Save anime'}'
                                                 aria-pressed='${isSaved(anime.paheId)}'
+                                                title='${isSaved(anime.paheId) ? 'Remove from library' : 'Add to library'}'
                                             >
                                                 <img
                                                     class='${styles.saveIcon}'
-                                                    src='${isSaved(anime.paheId) ? BookMarkIcon : UnBookMarkIcon}'
-                                                    alt=''
+                                                    src="${isSaved(anime.paheId) ? BookMarkIcon : UnBookMarkIcon}"
+                                                    alt='Bookmark Icon'
                                                 />
                                             </button>
                                         </td>
@@ -138,26 +135,20 @@ export default function Events() {
                     ← TRY AGAIN
                 </a>
 
-                ${
-                    canMore()
-                        ? `
-                            <button id='more-button' class='${styles.moreButton}' type='button'>
-                                MORE RECOMMENDATIONS →
-                            </button>
+                <button id='more-button' class='${styles.moreButton}' type='button'>
+                    MORE RECOMMENDATIONS →
+                </button>
+                `
 
-                        `
-                        : ''
-                }
-            `
-
-            const moreButton = document.querySelector('#more-button')
-            if (moreButton) {
-                moreButton.addEventListener('click', handleMore)
-            }
+            document.querySelector('#more-button').addEventListener('click', handleMore)
         }
 
+        let stopLoadingScreen = null
+
         function showLoadingScreen() {
-            LoadingScreen(document.querySelector('#main'))
+            const root = document.querySelector('#main')
+            LoadingScreen(root)
+            stopLoadingScreen = LoadingScreenEvents(root)
         }
 
         function restorePage() {
@@ -170,7 +161,6 @@ export default function Events() {
 
         function handleMore() {
             if (isFetchingMore) return
-            if (!canMore()) return
 
             isFetchingMore = true
 
@@ -181,13 +171,18 @@ export default function Events() {
                 TIME_STEPS[timeIndex()],
                 shownIds(),
                 allowMatureGenres(),
+                allowedSideStoryTypes(),
             )
                 .then((data) => {
+                    stopLoadingScreen?.()
+
                     setRecommendations(data)
                     setShownIds((prev) => [...prev, ...data.map((anime) => anime.id)])
                     window.app.pushRoute('/results')
                 })
                 .catch((error) => {
+                    stopLoadingScreen?.()
+
                     console.error('Failed to fetch more recommendations:', error)
 
                     isFetchingMore = false

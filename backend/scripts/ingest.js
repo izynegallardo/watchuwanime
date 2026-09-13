@@ -36,16 +36,27 @@ function parseJsonArray(value) {
 // into the embedded text would let the dataset's own "related anime" bias
 // leak into vector similarity, which defeats the point of doing RAG at all.
 // They're kept only as structured fallback data, applied post-search.
+// Same reasoning for external_links, dates, image URLs, and any other raw
+// metadata blob - none of it describes what the anime is actually *about*,
+// so it stays out of the embedded text entirely.
 function formatContent(row) {
     const genres = parseJsonArray(row.genres)
     const themes = parseJsonArray(row.themes)
     const demographics = parseJsonArray(row.demographics)
     const studios = parseJsonArray(row.studios)
+    const synonyms = splitCommaList(row.synonyms)
+
+    const alternateTitles = [
+        row.title_romaji && row.title_romaji !== row.title ? row.title_romaji : null,
+        row.title_japanese,
+        row.title_spanish,
+        row.title_french,
+        ...synonyms,
+    ].filter(Boolean)
 
     const parts = [
         row.title,
-        row.title_romaji && row.title_romaji !== row.title ? row.title_romaji : null,
-        row.title_japanese,
+        alternateTitles.join(', '),
         row.type,
         genres.join(', '),
         themes.join(', '),

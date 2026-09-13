@@ -6,12 +6,14 @@ export async function fetchRecommendations(
     timeAvailable,
     excludeIds = [],
     allowMatureGenres = false,
+    allowedSideStoryTypes = [],
 ) {
     const response = await apiClient.post('/anime/recommend', {
         answers,
         timeAvailable,
         excludeIds,
         allowMatureGenres,
+        allowedSideStoryTypes,
     })
 
     return response.data.recommendations

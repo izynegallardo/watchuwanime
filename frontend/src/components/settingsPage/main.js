@@ -15,7 +15,7 @@ export default function Main(root) {
             </h1>
 
             <p class="${styles.description}">
-                Control how recommendations are generated for this browser.
+                Control how recommendations are generated.
             </p>
         </div>
 
@@ -27,14 +27,13 @@ export default function Main(root) {
                             Theme
                         </p>
                         <p class="${styles.containerDescription}">
-                            Switch between light and dark mode for this browser.
+                            Switch between light and dark mode.
                         </p>
                     </div>
                 </div>
             </div>
-
+            <div id='allow-special'></div>
             <div id='allow-mature'></div>
-
             <div id='clear-save' class="${styles.clearSave}"></div>
         </section>
     `

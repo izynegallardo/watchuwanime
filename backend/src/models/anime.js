@@ -149,7 +149,13 @@ class Anime {
      */
     async search(
         embedding,
-        { matchThreshold = 0.3, matchCount = 10, excludeIds = [], excludeGenres = [] } = {},
+        {
+            matchThreshold = 0.3,
+            matchCount = 10,
+            excludeIds = [],
+            excludeGenres = [],
+            excludeTypes = [],
+        } = {},
     ) {
         return this.isLocal
             ? this.#searchLocal(embedding, {
@@ -157,16 +163,21 @@ class Anime {
                   matchCount,
                   excludeIds,
                   excludeGenres,
+                  excludeTypes,
               })
             : this.#searchRemote(embedding, {
                   matchThreshold,
                   matchCount,
                   excludeIds,
                   excludeGenres,
+                  excludeTypes,
               })
     }
 
-    async #searchRemote(embedding, { matchThreshold, matchCount, excludeIds, excludeGenres }) {
+    async #searchRemote(
+        embedding,
+        { matchThreshold, matchCount, excludeIds, excludeGenres, excludeTypes },
+    ) {
         try {
             const { supabase } = await import('../core/supabase.js')
             const results = await supabase.rpc('match_anime', {
@@ -177,6 +188,7 @@ class Anime {
                 match_count: matchCount,
                 exclude_ids: excludeIds,
                 exclude_genres: excludeGenres,
+                exclude_types: excludeTypes,
             })
 
             if (results.error)
@@ -192,7 +204,10 @@ class Anime {
         }
     }
 
-    async #searchLocal(embedding, { matchThreshold, matchCount, excludeIds, excludeGenres }) {
+    async #searchLocal(
+        embedding,
+        { matchThreshold, matchCount, excludeIds, excludeGenres, excludeTypes },
+    ) {
         try {
             const { pool } = await import('../core/database.js')
             const result = await pool.query(
@@ -208,10 +223,18 @@ class Anime {
                     where 1 - (embedding <=> $1) > $2
                         and id <> all($3)
                         and not (genres && $4)
+                        and (type is null or type <> all($5))
                     order by (embedding <=> $1) asc
-                    limit $5
+                    limit $6
                 `,
-                [toVectorLiteral(embedding), matchThreshold, excludeIds, excludeGenres, matchCount],
+                [
+                    toVectorLiteral(embedding),
+                    matchThreshold,
+                    excludeIds,
+                    excludeGenres,
+                    excludeTypes,
+                    matchCount,
+                ],
             )
 
             return result.rows.map((row) => ({
@@ -246,6 +269,35 @@ class Anime {
             return results.data
         } catch (error) {
             console.error('<error> anime.findById', error)
+            throw error
+        }
+    }
+
+    /**
+     * Bulk id lookup - used by recommend() to expand excludeIds with the
+     * relations of anime already shown this session, so a franchise dedupe
+     * that only works within a single search (see dedupeByRelations) also
+     * holds across separate "More Recommendations" calls.
+     */
+    async findByIds(ids) {
+        if (!ids.length) return []
+
+        try {
+            if (this.isLocal) {
+                const { pool } = await import('../core/database.js')
+                const result = await pool.query('select * from anime where id = any($1)', [ids])
+                return result.rows
+            }
+
+            const { supabase } = await import('../core/supabase.js')
+            const results = await supabase.from('anime').select('*').in('id', ids)
+
+            if (results.error)
+                throw new Error(`Failed to find anime by id: ${JSON.stringify(results.error)}`)
+
+            return results.data
+        } catch (error) {
+            console.error('<error> anime.findByIds', error)
             throw error
         }
     }

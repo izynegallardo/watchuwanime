@@ -1,8 +1,5 @@
 import Anime from '../../models/anime.js'
-import {
-    recommendSchema,
-    animePaheIdParamSchema,
-} from '../../schemas/animeSchema.js'
+import { recommendSchema, animePaheIdParamSchema } from '../../schemas/animeSchema.js'
 import { generateEmbedding } from '../../services/embedding.js'
 import { generatePersonalizedSummaries } from '../../services/chat.js'
 import {
@@ -21,27 +18,30 @@ const RELAXED_MATCH_THRESHOLD = 0.15
 
 // Excluded from every search unless the request opts in via allowMatureGenres.
 // Add more genre strings here if the dataset ever introduces further mature tags.
-const MATURE_GENRES = ['Ecchi']
+const MATURE_GENRES = ['Ecchi', 'Erotica', 'Hentai']
+
+// Excluded from every search unless the request opts a given type back in via
+// allowedSideStoryTypes (frontend: settingsPage's per-type checkboxes).
+const SIDE_STORY_TYPES = ['Music', 'Special', 'ONA', 'OVA']
 
 // Which ranking factors apply on top of raw similarity.
 // Empty array skips reranking entirely and falls back to pure similarity order.
-const ENABLED_RANK_FACTORS = ['duration', 'status']
+const ENABLED_RANK_FACTORS = ['duration']
 
 // Display order for the relations tab - matches how sites like AniList group
 // these (direct continuations first, tangential entries like OSTs/parodies
 // last). Anything not listed here falls to the end via relationTypeRank().
 const RELATION_TYPE_ORDER = [
-    'Sequel',
+    'Alternative Setting',
+    'Alternative Version',
+    'Character',
+    'Full Story',
+    'Parent Story',
     'Prequel',
+    'Sequel',
     'Side Story',
     'Spin-off',
-    'Alternative Version',
-    'Alternative Setting',
-    'Parent Story',
-    'Full Story',
     'Summary',
-    'Adaptation',
-    'Character',
     'Other',
 ]
 
@@ -115,10 +115,18 @@ class AnimeController {
 
     async recommend(request, response) {
         try {
-            const { answers, timeAvailable, excludeIds, allowMatureGenres } = recommendSchema.parse(
-                request.body,
-            )
+            const {
+                answers,
+                timeAvailable,
+                excludeIds: shownIds,
+                allowMatureGenres,
+                allowedSideStoryTypes,
+            } = recommendSchema.parse(request.body)
             const excludeGenres = allowMatureGenres ? [] : MATURE_GENRES
+            const excludeTypes = SIDE_STORY_TYPES.filter(
+                (type) => !allowedSideStoryTypes.includes(type),
+            )
+            const excludeIds = await this.#expandExcludeIds(shownIds)
 
             const queryText = buildQueryText(answers)
             const vector = await generateEmbedding(queryText)
@@ -126,6 +134,7 @@ class AnimeController {
             let candidates = await this.anime.search(vector, {
                 excludeIds,
                 excludeGenres,
+                excludeTypes,
                 matchCount: CANDIDATE_POOL_SIZE,
             })
             let { primary, deferred } = buildPools(candidates, timeAvailable, queryText)
@@ -139,6 +148,7 @@ class AnimeController {
                 const wider = await this.anime.search(vector, {
                     excludeIds: [...excludeIds, ...seenIds],
                     excludeGenres,
+                    excludeTypes,
                     matchCount: WIDE_POOL_SIZE,
                     matchThreshold: RELAXED_MATCH_THRESHOLD,
                 })
@@ -146,22 +156,38 @@ class AnimeController {
                 ;({ primary, deferred } = buildPools(candidates, timeAvailable, queryText))
             }
 
-            let matches = mmrRerank(
-                primary.length >= RESULT_COUNT ? primary : [...primary, ...deferred],
-                RESULT_COUNT,
-            )
+            let matches = mmrRerank(primary, RESULT_COUNT)
 
-            // Step 2 (guarantee-10, part B): last resort, only reached if the
-            // dataset itself can't supply RESULT_COUNT distinct anime within
-            // timeAvailable. Pulls from relations/recommendations of what we
-            // already matched - never used to seed or bias the vector search.
+            // Step 2 (guarantee-10, part B): not enough distinct-franchise
+            // matches even after widening - pull from relations/recommendations
+            // of what we already matched. Still franchise-aware (see the
+            // coveredPaheIds check inside #backfillFromRelated), so this can't
+            // reintroduce the same repeats buildPools just deferred.
             if (matches.length < RESULT_COUNT) {
                 matches = await this.#backfillFromRelated(matches, [...primary, ...deferred], {
                     excludeIds,
                     excludeGenres,
+                    excludeTypes,
                     timeAvailable,
                     queryText,
                 })
+            }
+
+            // Step 3 (guarantee-10, part C): absolute last resort, only
+            // reached if the dataset can't supply RESULT_COUNT distinct
+            // anime at all. Allows same-franchise repeats (whatever
+            // dedupeByRelations deferred) to fill the remaining slots - a
+            // repeat is still preferable to returning fewer than RESULT_COUNT.
+            if (matches.length < RESULT_COUNT) {
+                const selectedIds = new Set(matches.map((match) => match.id))
+
+                for (const candidate of deferred) {
+                    if (matches.length >= RESULT_COUNT) break
+                    if (selectedIds.has(candidate.id)) continue
+
+                    matches.push(candidate)
+                    selectedIds.add(candidate.id)
+                }
             }
 
             const summaries = await generatePersonalizedSummaries(queryText, matches, timeAvailable)
@@ -179,10 +205,37 @@ class AnimeController {
         }
     }
 
+    /**
+     * dedupeByRelations() only sees the candidate pool of a single search, so
+     * it can't stop a sequel/side-story from surfacing on a later "More
+     * Recommendations" call once the original has already been shown and
+     * excluded by id alone. This closes that gap: pull the already-shown
+     * anime's own `relations` (sequels, prequels, side stories, specials,
+     * etc.), resolve those pahe_ids to internal ids, and fold them into
+     * excludeIds before any search runs.
+     */
+    async #expandExcludeIds(excludeIds) {
+        if (!excludeIds.length) return excludeIds
+
+        const shown = await this.anime.findByIds(excludeIds)
+
+        const relatedPaheIds = new Set()
+        for (const match of shown) {
+            for (const rel of match.relations ?? []) {
+                relatedPaheIds.add(rel.pahe_id)
+            }
+        }
+        if (!relatedPaheIds.size) return excludeIds
+
+        const related = await this.anime.findByPaheIds([...relatedPaheIds])
+
+        return [...new Set([...excludeIds, ...related.map((match) => match.id)])]
+    }
+
     async #backfillFromRelated(
         matches,
         pool,
-        { excludeIds, excludeGenres, timeAvailable, queryText },
+        { excludeIds, excludeGenres, excludeTypes, timeAvailable, queryText },
     ) {
         const seedPaheIds = new Set()
         for (const match of pool) {
@@ -199,17 +252,32 @@ class AnimeController {
         const useEpisodeLength = timeAvailable <= SHORT_SESSION_MINUTES
         const result = [...matches]
 
+        // `pool` (primary + deferred) is exactly what seeded seedPaheIds above,
+        // so without this check a franchise dedupeByRelations already deferred
+        // could sneak right back in here via its own relations pointers -
+        // defeating the whole point of this being franchise-aware backfill.
+        const coveredPaheIds = new Set()
+        for (const match of result) {
+            coveredPaheIds.add(match.pahe_id)
+            for (const rel of match.relations ?? []) coveredPaheIds.add(rel.pahe_id)
+        }
+
         for (const candidate of fallbackCandidates) {
             if (result.length >= RESULT_COUNT) break
             if (selectedIds.has(candidate.id) || excludedIdSet.has(candidate.id)) continue
+            if (coveredPaheIds.has(candidate.pahe_id)) continue
+            if (candidate.relations?.some((rel) => coveredPaheIds.has(rel.pahe_id))) continue
 
             const minutes = useEpisodeLength ? candidate.duration_minutes : candidate.total_minutes
             if (minutes && minutes > timeAvailable) continue
             if (excludeGenres.length && candidate.genres?.some((g) => excludeGenres.includes(g)))
                 continue
+            if (excludeTypes.length && excludeTypes.includes(candidate.type)) continue
 
             result.push(candidate)
             selectedIds.add(candidate.id)
+            coveredPaheIds.add(candidate.pahe_id)
+            for (const rel of candidate.relations ?? []) coveredPaheIds.add(rel.pahe_id)
         }
 
         return result

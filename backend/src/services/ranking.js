@@ -1,32 +1,25 @@
 const SIMILARITY_WEIGHT = 0.6
 
-// Below this, judging fit by total series runtime would wrongly exclude
-// nearly everything - 25 min is the shortest selectable session
-// (TIME_STEPS[0] in the frontend), and almost no multi-episode series has a
-// total runtime that short. So a "quick episode" session falls back to
-// per-episode length (duration_minutes) instead. Above this threshold,
-// total_minutes is the primary metric, so a real time budget ("I have 2
-// hours") surfaces anime that can actually be finished in that sitting,
-// not just anime whose first episode happens to fit.
+// Only used by the hard eligibility filter (buildPools/backfillFromRelated
+// in animeController.js) to decide duration_minutes vs total_minutes -
+// scoring below always uses total_minutes regardless of session length.
 export const SHORT_SESSION_MINUTES = 25
 
 export const RANK_FACTORS = {
     duration: {
-        weight: 0.3,
+        // Kept low relative to SIMILARITY_WEIGHT - duration should nudge
+        // ranking toward anime that fit the session, not override genuine
+        // thematic relevance. A full-length series will always score worse
+        // here than a short one against most timeAvailable values (its
+        // total runtime is just bigger), so a high weight was drowning out
+        // similarity almost entirely - short-form/movie content was winning
+        // on duration alone regardless of actual fit.
+        weight: 0.15,
         score: (match, { timeAvailable }) => {
-            const useEpisodeLength = timeAvailable <= SHORT_SESSION_MINUTES
-            const minutes = useEpisodeLength ? match.duration_minutes : match.total_minutes
+            const minutes = match.total_minutes
 
             if (!minutes) return 0.5
             return 1 / (1 + Math.abs(Math.log(minutes / timeAvailable)))
-        },
-    },
-    status: {
-        weight: 0.1,
-        score: (match) => {
-            if (match.status === 'Finished Airing') return 1
-            if (match.status === 'Currently Airing') return 0.7
-            return 0.3
         },
     },
 }

@@ -3,6 +3,7 @@ import {
     viewerCount,
     timeIndex,
     allowMatureGenres,
+    allowedSideStoryTypes,
     selectedGenres,
     setSelectedGenres,
     subscribeSelectedGenres,
@@ -23,6 +24,7 @@ import { TIME_STEPS } from '@/data/time'
 import { fetchRecommendations } from '@/api/anime'
 import { getRandomInt } from '@/utils/random'
 import LoadingScreen from '@/components/loadingScreen/main'
+import LoadingScreenEvents from '@/components/loadingScreen/event'
 import Main from './main'
 
 const MIN_WORDS = 10
@@ -132,8 +134,12 @@ export default function Events() {
             updateNextButton()
         }
 
+        let stopLoadingScreen = null
+
         function showLoadingScreen() {
-            LoadingScreen(document.querySelector('#main'))
+            const root = document.querySelector('#main')
+            LoadingScreen(root)
+            stopLoadingScreen = LoadingScreenEvents(root)
         }
 
         function restorePage() {
@@ -173,8 +179,11 @@ export default function Events() {
                     TIME_STEPS[timeIndex()],
                     shownIds(),
                     allowMatureGenres(),
+                    allowedSideStoryTypes(),
                 )
                     .then((data) => {
+                        stopLoadingScreen?.()
+
                         setSessionAnswers(allAnswers)
                         setRecommendations(data)
                         setShownIds((prev) => [...prev, ...data.map((anime) => anime.id)])
@@ -182,6 +191,8 @@ export default function Events() {
                         window.app.pushRoute('/results')
                     })
                     .catch((error) => {
+                        stopLoadingScreen?.()
+
                         console.error('Failed to fetch recommendations:', error)
 
                         isFetchingRecommendations = false

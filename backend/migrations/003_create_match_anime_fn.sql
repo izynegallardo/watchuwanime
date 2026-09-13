@@ -1,13 +1,15 @@
 set search_path to "$user", public, extensions;
 
 drop function if exists match_anime(extensions.vector(384), float, int, bigint[], text[]);
+drop function if exists match_anime(extensions.vector(384), float, int, bigint[], text[], text[]);
 
 create or replace function match_anime (
   query_embedding extensions.vector(384),
   match_threshold float,
   match_count int,
   exclude_ids bigint[] default '{}',
-  exclude_genres text[] default '{}'
+  exclude_genres text[] default '{}',
+  exclude_types text[] default '{}'
 )
 returns table (
   id bigint,
@@ -56,6 +58,7 @@ as $$
   where 1 - (anime.embedding <=> query_embedding) > match_threshold
     and anime.id <> all(exclude_ids)
     and not (anime.genres && exclude_genres)
+    and (anime.type is null or anime.type <> all(exclude_types))
   order by (anime.embedding <=> query_embedding) asc
   limit match_count;
 $$;

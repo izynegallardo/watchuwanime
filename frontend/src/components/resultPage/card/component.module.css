@@ -159,6 +159,10 @@
         color 200ms ease;
 }
 
+.animeCardSaveMobile {
+    display: none;
+}
+
 .animeCardSave:hover {
     border-color: var(--primary);
 }
@@ -223,6 +227,7 @@
     display: flex;
     flex-direction: column;
     padding: 1.5rem;
+    max-height: 350px;
     text-align: left;
     overflow: auto;
 }
@@ -353,5 +358,27 @@
 
     .animeCardBody {
         min-height: auto;
+        max-height: 100%;
+    }
+
+    .animeCardSave {
+        display: none;
+    }
+
+    .animeCardSaveMobile {
+        position: absolute;
+        left: 82%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: #fff;
+        cursor: pointer;
+        transition:
+            background-color 200ms ease,
+            border-color 200ms ease,
+            color 200ms ease;
     }
 }
