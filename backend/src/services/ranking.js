@@ -1,10 +1,5 @@
 const SIMILARITY_WEIGHT = 0.6
 
-// Only used by the hard eligibility filter (buildPools/backfillFromRelated
-// in animeController.js) to decide duration_minutes vs total_minutes -
-// scoring below always uses total_minutes regardless of session length.
-export const SHORT_SESSION_MINUTES = 25
-
 export const RANK_FACTORS = {
     duration: {
         // Kept low relative to SIMILARITY_WEIGHT - duration should nudge

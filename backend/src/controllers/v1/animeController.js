@@ -7,7 +7,6 @@ import {
     mmrRerank,
     dedupeByRelations,
     excludeSelfReferencedTitles,
-    SHORT_SESSION_MINUTES,
 } from '../../services/ranking.js'
 import { responseError } from '../../utils/error.js'
 
@@ -92,19 +91,20 @@ function buildQueryText(answers) {
         .join('\n')
 }
 
-// Hard-filters out self-referenced and out-of-time candidates, ranks by
-// fit, then splits out same-franchise repeats (dedupeByRelations) so a
-// single series can't crowd the top results. Returns { primary, deferred }.
+// Hard-filters out self-referenced candidates, ranks by fit (which
+// includes a soft duration preference - see RANK_FACTORS.duration in
+// ranking.js), then splits out same-franchise repeats (dedupeByRelations)
+// so a single series can't crowd the top results. Returns { primary, deferred }.
+//
+// Deliberately does NOT hard-exclude anime whose total runtime exceeds
+// timeAvailable: anime episode counts/lengths are too varied for a hard
+// "must fit in one sitting" cutoff to make sense (unlike movies, which sit
+// in a narrow, predictable range) - nobody expects to finish a 24-episode
+// series in one sitting regardless of how much time they picked. Duration
+// only nudges the ranking now, it never makes an anime invisible outright.
 function buildPools(candidates, timeAvailable, queryText) {
     const notSelfReferenced = excludeSelfReferencedTitles(candidates, queryText)
-
-    const withinTime = notSelfReferenced.filter((match) => {
-        const useEpisodeLength = timeAvailable <= SHORT_SESSION_MINUTES
-        const minutes = useEpisodeLength ? match.duration_minutes : match.total_minutes
-        return !minutes || minutes <= timeAvailable
-    })
-
-    const ranked = rankByFit(withinTime, { timeAvailable }, ENABLED_RANK_FACTORS)
+    const ranked = rankByFit(notSelfReferenced, { timeAvailable }, ENABLED_RANK_FACTORS)
     return dedupeByRelations(ranked)
 }
 
@@ -168,7 +168,6 @@ class AnimeController {
                     excludeIds,
                     excludeGenres,
                     excludeTypes,
-                    timeAvailable,
                     queryText,
                 })
             }
@@ -235,7 +234,7 @@ class AnimeController {
     async #backfillFromRelated(
         matches,
         pool,
-        { excludeIds, excludeGenres, excludeTypes, timeAvailable, queryText },
+        { excludeIds, excludeGenres, excludeTypes, queryText },
     ) {
         const seedPaheIds = new Set()
         for (const match of pool) {
@@ -249,7 +248,6 @@ class AnimeController {
         const fallbackCandidates = excludeSelfReferencedTitles(found, queryText)
         const selectedIds = new Set(matches.map((match) => match.id))
         const excludedIdSet = new Set(excludeIds)
-        const useEpisodeLength = timeAvailable <= SHORT_SESSION_MINUTES
         const result = [...matches]
 
         // `pool` (primary + deferred) is exactly what seeded seedPaheIds above,
@@ -268,8 +266,6 @@ class AnimeController {
             if (coveredPaheIds.has(candidate.pahe_id)) continue
             if (candidate.relations?.some((rel) => coveredPaheIds.has(rel.pahe_id))) continue
 
-            const minutes = useEpisodeLength ? candidate.duration_minutes : candidate.total_minutes
-            if (minutes && minutes > timeAvailable) continue
             if (excludeGenres.length && candidate.genres?.some((g) => excludeGenres.includes(g)))
                 continue
             if (excludeTypes.length && excludeTypes.includes(candidate.type)) continue
