@@ -21,8 +21,10 @@ import {
 import { GENRES, THEMES } from '@/data/genres'
 import { PLACEHOLDERS } from '@/data/placeholders'
 import { TIME_STEPS } from '@/data/time'
+import { TEMPLATE } from '@/data/template'
 import { fetchRecommendations } from '@/api/anime'
 import { getRandomInt } from '@/utils/random'
+import { confirmAction } from '@/utils/confirmDialog'
 import LoadingScreen from '@/components/loadingScreen/main'
 import LoadingScreenEvents from '@/components/loadingScreen/event'
 import Main from './main'
@@ -97,13 +99,21 @@ export default function Events() {
 
         function renderFooterBtn() {
             document.querySelector('#form-footer').innerHTML = `
-                <button id='next-button' class='${styles.nextButton}' type='button'>
-                    ${isLastUser() ? 'SEE RECOMMENDATIONS →' : 'NEXT USER →'}
-                </button>
+                <div class='${styles.footerButtons}'>
+                    <button id='surprise-button' class='${styles.surpriseButton}' type='button'>
+                        SURPRISE ME
+                    </button>
+
+                    <button id='next-button' class='${styles.nextButton}' type='button'>
+                        ${isLastUser() ? 'SEE RECOMMENDATIONS →' : 'NEXT USER →'}
+                    </button>
+                </div>
             `
             const nextButtonEl = document.querySelector('#next-button')
+            const surpriseButtonEl = document.querySelector('#surprise-button')
 
             nextButtonEl.addEventListener('click', handleNext)
+            surpriseButtonEl.addEventListener('click', handleSurprise)
 
             updateNextButton()
         }
@@ -151,6 +161,42 @@ export default function Events() {
 
         let isFetchingRecommendations = false
 
+        // Shared by the normal last-user submit and Surprise Me - both end up
+        // fetching recommendations from a finished `allAnswers` array and
+        // handing off to the results page the same way.
+        function submitAnswers(allAnswers) {
+            if (isFetchingRecommendations) return
+
+            isFetchingRecommendations = true
+
+            showLoadingScreen()
+
+            fetchRecommendations(
+                allAnswers,
+                TIME_STEPS[timeIndex()],
+                shownIds(),
+                allowMatureGenres(),
+                allowedSideStoryTypes(),
+            )
+                .then((data) => {
+                    stopLoadingScreen?.()
+
+                    setSessionAnswers(allAnswers)
+                    setRecommendations(data)
+                    setShownIds((prev) => [...prev, ...data.map((anime) => anime.id)])
+
+                    window.app.pushRoute('/results')
+                })
+                .catch((error) => {
+                    stopLoadingScreen?.()
+
+                    console.error('Failed to fetch recommendations:', error)
+
+                    isFetchingRecommendations = false
+                    restorePage()
+                })
+        }
+
         function handleNext() {
             const wordCount = getWordCount(answer())
 
@@ -160,10 +206,6 @@ export default function Events() {
             }
 
             if (isLastUser()) {
-                if (isFetchingRecommendations) return
-
-                isFetchingRecommendations = true
-
                 const allAnswers = [
                     ...sessionAnswers(),
                     {
@@ -172,33 +214,7 @@ export default function Events() {
                     },
                 ]
 
-                showLoadingScreen()
-
-                fetchRecommendations(
-                    allAnswers,
-                    TIME_STEPS[timeIndex()],
-                    shownIds(),
-                    allowMatureGenres(),
-                    allowedSideStoryTypes(),
-                )
-                    .then((data) => {
-                        stopLoadingScreen?.()
-
-                        setSessionAnswers(allAnswers)
-                        setRecommendations(data)
-                        setShownIds((prev) => [...prev, ...data.map((anime) => anime.id)])
-
-                        window.app.pushRoute('/results')
-                    })
-                    .catch((error) => {
-                        stopLoadingScreen?.()
-
-                        console.error('Failed to fetch recommendations:', error)
-
-                        isFetchingRecommendations = false
-                        restorePage()
-                    })
-
+                submitAnswers(allAnswers)
                 return
             }
 
@@ -212,6 +228,41 @@ export default function Events() {
 
             clearForNextUser()
             render()
+        }
+
+        // Picks a random prompt from TEMPLATE, fills it in as this user's
+        // answer/genres, and submits immediately - ignoring sessionAnswers()
+        // from any earlier users in this round. With more than one viewer that
+        // means the remaining viewer(s) never get to answer, so it's gated
+        // behind a confirmation first.
+        function handleSurprise() {
+            if (isFetchingRecommendations) return
+
+            const template = TEMPLATE[getRandomInt(0, TEMPLATE.length - 1)]
+
+            function proceed() {
+                setSelectedGenres(template.genres)
+                setAnswer(template.answer)
+
+                const textareaEl = document.querySelector('#answer-text-area')
+                if (textareaEl) textareaEl.value = template.answer
+
+                updateNextButton()
+
+                submitAnswers([{ genres: template.genres, answer: template.answer }])
+            }
+
+            if (viewerCount() > 1) {
+                confirmAction({
+                    title: 'Surprise me?',
+                    message: `This fills in a random request and submits it right away, skipping the remaining ${viewerCount() - 1} viewer(s) for this round.`,
+                    confirmLabel: 'Surprise me',
+                    onConfirm: proceed,
+                })
+                return
+            }
+
+            proceed()
         }
 
         function clearForNextUser() {

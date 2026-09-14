@@ -109,9 +109,11 @@ export default function Events(params) {
             // See resultPage/event.js for why this pushes into the shared
             // store (syncSavedIds) instead of patching this button's DOM
             // directly - subscribeSavedIds(syncSaveButtons) below does that.
-            document.querySelector('[data-action="toggle-save"]')?.addEventListener('click', (event) => {
-                toggleSaved(event.currentTarget.dataset.paheId)
-                syncSavedIds()
+            document.querySelectorAll('[data-action="toggle-save"]').forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    toggleSaved(event.currentTarget.dataset.paheId)
+                    syncSavedIds()
+                })
             })
 
             document.querySelectorAll('[data-tab]').forEach((button) => {

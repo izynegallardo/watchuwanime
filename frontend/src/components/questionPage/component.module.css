@@ -148,16 +148,24 @@
     border-top: 1px solid var(--border);
 }
 
+/* Footer buttons row */
+
+.question .footerButtons {
+    display: flex;
+    gap: 0.75rem;
+}
+
 /* Next button */
 
 .question .nextButton {
+    flex: 2;
     justify-content: center;
     border: none;
     border-radius: 0;
     padding: 1rem;
-    width: 100%;
     background: var(--primary);
     color: #fff;
+    font-family: var(--mono);
     font-size: 0.875rem;
     font-weight: 700;
     letter-spacing: 0.1em;
@@ -173,14 +181,40 @@
     opacity: 0.8;
 }
 
-.question .nextButton:hover {
-    text-decoration: none;
-    opacity: 0.8;
-}
-
 .question .nextButton:disabled {
     cursor: not-allowed;
     opacity: 0.5;
+}
+
+/* Surprise Me button */
+
+.question .surpriseButton {
+    flex: 1;
+    justify-content: center;
+    border: 1px solid var(--primary);
+    padding: 1rem;
+    background: transparent;
+    color: var(--primary);
+    font-family: var(--mono);
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-align: center;
+    cursor: pointer;
+    transition:
+        background-color 0.2s,
+        opacity 0.2s,
+        transform 0.1s;
+}
+
+.question .surpriseButton:hover {
+    background: var(--primary);
+    color: #fff;
+}
+
+.question .nextButton:active,
+.question .surpriseButton:active {
+    transform: scale(0.99);
 }
 
 .question .genreFieldset {

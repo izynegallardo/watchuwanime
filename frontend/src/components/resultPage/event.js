@@ -1,7 +1,7 @@
 import styles from './component.module.css'
 import AnimeCard, { syncSaveButtons } from './card/main'
 import { useState } from '@/core/useState'
-import { recommendations, subscribeRecommendations } from '@/store/counter'
+import { recommendations, shownIds, subscribeRecommendations } from '@/store/counter'
 import { subscribeSavedIds, syncSavedIds } from '@/store/saved'
 import { fetchAnimeRelations } from '@/api/anime'
 import { toggleSaved } from '@/utils/saved'
@@ -87,10 +87,12 @@ export default function Events() {
         }
 
         function renderEmpty() {
+            const isFirstAttempt = shownIds().length === 0
+
             document.querySelector('#result-content').innerHTML = `
                 <div class='${styles.empty}'>
                     <p class='${styles.emptyText}'>
-                        NO MORE RECOMMENDATIONS
+                        ${isFirstAttempt ? 'NO MATCHES FOUND' : 'NO MORE RECOMMENDATIONS'}
                     </p>
                     <a class='${styles.emptyLink}' href='/'>
                         START OVER
@@ -194,9 +196,11 @@ export default function Events() {
             // change into the shared store, which every mounted save button
             // (this one included) picks up via subscribeSavedIds(syncSaveButtons)
             // below - so no direct DOM patching happens in this handler itself.
-            document.querySelector('[data-action="toggle-save"]')?.addEventListener('click', (event) => {
-                toggleSaved(event.currentTarget.dataset.paheId)
-                syncSavedIds()
+            document.querySelectorAll('[data-action="toggle-save"]').forEach((button) => {
+                button.addEventListener('click', (event) => {
+                    toggleSaved(event.currentTarget.dataset.paheId)
+                    syncSavedIds()
+                })
             })
 
             document.querySelectorAll('[data-index]').forEach((button) => {

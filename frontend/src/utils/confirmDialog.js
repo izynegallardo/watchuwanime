@@ -36,3 +36,29 @@ export function confirmDestructive({ title, message, confirmLabel = 'Delete', on
         },
     })
 }
+
+/**
+ * Opens a confirm/cancel dialog for a non-destructive action that still
+ * needs a heads-up before proceeding (e.g. an action that discards other
+ * in-progress input). Same shape as confirmDestructive() but without the
+ * danger styling - `message` still must be pre-escaped HTML by the caller.
+ *
+ * @param {Object} options
+ * @param {string} options.title
+ * @param {string} options.message - pre-escaped HTML string
+ * @param {string} [options.confirmLabel]
+ * @param {() => void | Promise<void>} options.onConfirm
+ */
+export function confirmAction({ title, message, confirmLabel = 'Continue', onConfirm }) {
+    ensureModalInit()
+
+    modal.open({
+        title,
+        body: `<p class="modal-confirm-message">${message}</p>`,
+        submitLabel: confirmLabel,
+        variant: 'default',
+        onSubmit: async () => {
+            await onConfirm()
+        },
+    })
+}
